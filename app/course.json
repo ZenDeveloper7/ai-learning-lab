@@ -1,0 +1,609 @@
+[
+  {
+    "title": "AI foundations and the wider field",
+    "lessons": [
+      {
+        "id": 1,
+        "title": "AI's family tree",
+        "scope": "AI, rules, symbolic reasoning, machine learning, deep learning, generative AI, foundation models, and the difference between a model, product, provider, and runtime."
+      },
+      {
+        "id": 2,
+        "title": "Ways machines learn",
+        "scope": "Supervised, unsupervised, self-supervised, and reinforcement learning; labels, features, targets, predictions, rewards, and feedback—using concrete examples."
+      },
+      {
+        "id": 3,
+        "title": "AI beyond chat",
+        "scope": "Classification, regression, clustering, recommendations, anomaly detection, forecasting, search, planning, computer vision, speech, robotics, and when conventional software is sufficient."
+      },
+      {
+        "id": 4,
+        "title": "Reading AI claims",
+        "scope": "Capability versus reliability; narrow AI, AGI, and superintelligence; intelligence versus consciousness; evidence versus marketing; what a demo establishes and what it does not."
+      }
+    ],
+    "anchor": "A chatbot is an application assembled from capabilities. Understanding that assembly prevents attributing memory, browsing, or permissions to the model itself.",
+    "lab": "Classify ten everyday systems by task and learning approach. Draw a model inside an application and identify three things the application supplies.",
+    "checkpoint": "Explain why a recommendation system and a text generator can both be AI without doing the same job.",
+    "id": 1
+  },
+  {
+    "title": "Data, learning, and the model lifecycle",
+    "lessons": [
+      {
+        "id": 5,
+        "title": "What learning changes",
+        "scope": "Parameters/weights, architecture, training versus inference, checkpoints, pretraining versus post-training, and why an ordinary chat correction is not an immediate weight update."
+      },
+      {
+        "id": 6,
+        "title": "Data is part of the system",
+        "scope": "Collection, provenance, consent, licensing, labeling, deduplication, filtering, class balance, multilingual coverage, synthetic data, and human annotation."
+      },
+      {
+        "id": 7,
+        "title": "Generalization and failure",
+        "scope": "Train/validation/test splits; leakage, contamination, overfitting, underfitting, distribution shift, spurious correlations, and catastrophic forgetting."
+      },
+      {
+        "id": 8,
+        "title": "Training controls without equations",
+        "scope": "Loss as a training signal; gradients and backpropagation as credit assignment; optimizer, learning rate, batch, step, epoch, seed, checkpoint, validation curve, and early stopping."
+      }
+    ],
+    "anchor": "Training reduces an objective on examples. A lower training loss alone does not prove useful behavior on new inputs.",
+    "lab": "Create a small fictional classification dataset. Split related examples together so near-duplicates cannot leak between training and testing. Identify misleading shortcuts a model might learn.",
+    "checkpoint": "Why can training results improve while real-world performance gets worse?",
+    "id": 2
+  },
+  {
+    "title": "Model architectures and representations",
+    "lessons": [
+      {
+        "id": 9,
+        "title": "Neural networks intuitively",
+        "scope": "Layers, activations, representations, embeddings, and the conceptual roles of CNNs, RNNs, transformers, and state-space/hybrid models."
+      },
+      {
+        "id": 10,
+        "title": "Tokens and tokenizers",
+        "scope": "Subwords, vocabulary, special tokens, multilingual tokenization, text versus media tokens, token budgets, and why character/word counts are imperfect proxies."
+      },
+      {
+        "id": 11,
+        "title": "Inside a transformer",
+        "scope": "Attention, positional information, encoder, decoder, encoder-decoder, causal masking, and contextual representations; diagrams rather than matrix calculations."
+      },
+      {
+        "id": 12,
+        "title": "Architecture tradeoffs",
+        "scope": "Dense versus mixture-of-experts; total versus active parameters; routing; model size versus capability; context extension versus effective long-context use."
+      }
+    ],
+    "anchor": "An architecture describes how computation is organized; weights are what training learns. Parameter count does not capture every meaningful difference between models.",
+    "lab": "Trace a sentence through tokenization, model processing, and generated tokens. Compare descriptions of a text encoder and a generative decoder.",
+    "checkpoint": "Why are an embedding model and a chat model not interchangeable?",
+    "id": 3
+  },
+  {
+    "title": "Generation, reasoning, and reliability",
+    "lessons": [
+      {
+        "id": 13,
+        "title": "How text is produced",
+        "scope": "Autoregressive generation, token probabilities, greedy decoding, sampling, temperature, top-p/top-k, stop sequences, output limits, and repetition."
+      },
+      {
+        "id": 14,
+        "title": "Reasoning behavior",
+        "scope": "Reasoning-oriented models, test-time compute, decomposition, search, verification, self-consistency, and why a displayed explanation is not a faithful guaranteed transcript of internal computation."
+      },
+      {
+        "id": 15,
+        "title": "Typical failure modes",
+        "scope": "Hallucination, fabricated citations, ambiguity, sycophancy, bias, brittle counting, outdated information, and unsupported confidence."
+      },
+      {
+        "id": 16,
+        "title": "Checking answers",
+        "scope": "Ground truth, independent evidence, source checking, abstention, calibration, deterministic tools, and distinguishing model failure from missing context or failed execution."
+      }
+    ],
+    "anchor": "Generation produces plausible continuations conditioned on input. Correctness requires evidence or testing; sampling settings are not truth settings.",
+    "lab": "Test five answerable and five deliberately unanswerable questions. Check factual claims against original sources and record whether the model appropriately abstains.",
+    "checkpoint": "Why does 'I checked my answer' not independently verify it?",
+    "id": 4
+  },
+  {
+    "title": "Prompting, context, and memory",
+    "lessons": [
+      {
+        "id": 17,
+        "title": "Writing usable instructions",
+        "scope": "Task, audience, constraints, examples, acceptance criteria, zero-shot/few-shot, delimiters, output formats, and platform-dependent instruction precedence."
+      },
+      {
+        "id": 18,
+        "title": "Context windows",
+        "scope": "Input/output budgets, hidden application instructions, attachments, selected history, tool results, truncation, long-context limitations, and conflicting evidence."
+      },
+      {
+        "id": 19,
+        "title": "Memory systems",
+        "scope": "In-context learning versus weight updates; working, episodic, semantic, and procedural memory as application design ideas; persistent storage, retrieval, expiry, corrections, and provenance."
+      },
+      {
+        "id": 20,
+        "title": "Context engineering",
+        "scope": "Selection, ordering, summarization, compaction, handoffs, retrieval, context isolation, relevance, and preventing stale assumptions from persisting."
+      }
+    ],
+    "anchor": "Weights, current context, persistent memory, and cached computation are different things. A long history shown in an interface may not all be supplied on the next request.",
+    "lab": "Make a fictional project brief and a compact handoff. Compare answers in the original chat and a fresh chat supplied only the handoff. Account for app-level memory.",
+    "checkpoint": "Which facts disappeared, and was the cause missing context or incorrect reasoning?",
+    "sources": [
+      "[Context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)"
+    ],
+    "id": 5
+  },
+  {
+    "title": "Model selection, artifacts, and licensing",
+    "lessons": [
+      {
+        "id": 21,
+        "title": "Model families and variants",
+        "scope": "Base, instruct, reasoning, coding, embedding, reranker, vision-language, and specialist models; checkpoints, revisions, and fine-tuned variants."
+      },
+      {
+        "id": 22,
+        "title": "Reading a model card",
+        "scope": "Intended use, architecture, languages, context limits, chat template, training disclosure, evaluation, limitations, license, and required runtime support."
+      },
+      {
+        "id": 23,
+        "title": "What you download",
+        "scope": "Weights, tokenizer, configuration, chat template, adapters, metadata, sharded checkpoints, safetensors, and GGUF. Separate file formats, quantization schemes, and execution engines."
+      },
+      {
+        "id": 24,
+        "title": "Choosing responsibly",
+        "scope": "Open weights versus open source; hosted versus self-hosted; redistribution and commercial terms; task-fit evaluation, costs, dependencies, reproducibility, and trusted downloads."
+      }
+    ],
+    "anchor": "A model file is only part of a working setup. The tokenizer, template, runtime, and model revision must agree.",
+    "lab": "Build a comparison sheet for two model cards using public information. Mark undisclosed information as unknown rather than guessing.",
+    "checkpoint": "Why can using the wrong chat template damage an otherwise capable model's outputs?",
+    "id": 6
+  },
+  {
+    "title": "Running models locally",
+    "lessons": [
+      {
+        "id": 25,
+        "title": "Hardware literacy",
+        "scope": "CPU, GPU, NPU, RAM, VRAM, unified memory, bandwidth, compute, storage, thermals, power, and why a model fitting in memory does not imply useful speed."
+      },
+      {
+        "id": 26,
+        "title": "The local software stack",
+        "scope": "User interface, model manager, inference runtime, backend, driver, and local API server; CPU/GPU offloading; acceleration support and platform compatibility."
+      },
+      {
+        "id": 27,
+        "title": "A reproducible local run",
+        "scope": "Hardware inventory, suitable model choice, verified source, exact revision, chat template, context/output limits, generation settings, logs, and baseline prompts."
+      },
+      {
+        "id": 28,
+        "title": "Troubleshooting local inference",
+        "scope": "Out-of-memory errors, slow loading, slow generation, unsupported architectures, bad templates, quantization compatibility, server exposure, and checking whether a feature uses remote services."
+      }
+    ],
+    "anchor": "Local inference means running a model's forward computation on your hardware. It is distinct from training or fine-tuning that model.",
+    "lab": "Optional execution: choose a small compatible model after inspecting hardware, run ten fixed prompts, record memory, startup time, first-token delay, and output speed. Concept-only alternative: prepare a deployment plan from model cards and runtime docs.",
+    "checkpoint": "If a model loads but stalls with a longer prompt, what memory demands might have changed?",
+    "sources": [
+      "[llama.cpp](https://github.com/ggml-org/llama.cpp)",
+      "[MLX LM for Apple silicon](https://github.com/ml-explore/mlx-lm)"
+    ],
+    "id": 7
+  },
+  {
+    "title": "Quantization and model compression",
+    "lessons": [
+      {
+        "id": 29,
+        "title": "Precision without the maths",
+        "scope": "FP32, FP16, BF16, INT8, 4-bit representations, storage versus compute precision, mixed precision, and quality/resource tradeoffs."
+      },
+      {
+        "id": 30,
+        "title": "Quantization approaches",
+        "scope": "Post-training quantization versus quantization-aware training; weight, activation, and KV-cache quantization; calibration data; outliers; per-channel/group choices at a conceptual level."
+      },
+      {
+        "id": 31,
+        "title": "Reading quantized model labels",
+        "scope": "GGUF quantization labels, GPTQ, AWQ, bitsandbytes/NF4 as ecosystem examples; runtime and hardware compatibility; why equal bit counts do not imply equal quality or speed."
+      },
+      {
+        "id": 32,
+        "title": "Compression beyond quantization",
+        "scope": "Distillation, pruning, sparsity, and architectural changes; checkpoint size versus runtime memory; why 'smaller' and 'faster' are separate claims."
+      }
+    ],
+    "anchor": "Quantization reduces precision; LoRA changes how adaptation is trained. They can be combined but solve different problems. Four-bit weights do not mean every computation and training state is four-bit.",
+    "lab": "Compare two supported precision versions of the same model revision using identical prompts and settings. Measure quality, memory, and speed. If hardware is unavailable, design the comparison and identify confounders.",
+    "checkpoint": "Why might a smaller quantized file fail to generate faster on a particular device?",
+    "sources": [
+      "[PEFT quantization guide](https://huggingface.co/docs/peft/en/developer_guides/quantization)"
+    ],
+    "id": 8
+  },
+  {
+    "title": "Inference engineering and serving",
+    "lessons": [
+      {
+        "id": 33,
+        "title": "The inference lifecycle",
+        "scope": "Tokenization, prefill, decode, time to first token, time per output token, throughput, latency, streaming, and cold starts."
+      },
+      {
+        "id": 34,
+        "title": "Caches and memory",
+        "scope": "KV cache, context-length and concurrency effects, prefix/prompt caching, eviction, CPU offload, and why a cache is not durable semantic memory."
+      },
+      {
+        "id": 35,
+        "title": "Serving optimizations",
+        "scope": "Static/dynamic/continuous batching, paged attention, chunked prefill, speculative decoding, optimized kernels, parallelism, and throughput-versus-latency tradeoffs."
+      },
+      {
+        "id": 36,
+        "title": "Serving a model as a service",
+        "scope": "Queues, backpressure, concurrency, cancellation, limits, API compatibility, model routing, fallbacks, autoscaling, and offline versus interactive jobs."
+      }
+    ],
+    "anchor": "Prefill processes the prompt; decoding produces subsequent tokens. A serving system has to share memory and computation between these workloads and multiple users.",
+    "lab": "Design a benchmark varying one factor at a time: prompt length, output length, or concurrent requests. Report latency distributions and throughput separately.",
+    "checkpoint": "Why can a configuration serve more users per minute while making one user's response slower?",
+    "sources": [
+      "[Continuous batching](https://huggingface.co/docs/transformers/continuous_batching)",
+      "[vLLM documentation](https://docs.vllm.ai/en/latest/)"
+    ],
+    "id": 9
+  },
+  {
+    "title": "Training and fine-tuning local models",
+    "lessons": [
+      {
+        "id": 37,
+        "title": "Choosing the adaptation method",
+        "scope": "Training from scratch, continued pretraining, supervised fine-tuning, parameter-efficient fine-tuning, prompting, retrieval, and tool access: what each changes and when each fits."
+      },
+      {
+        "id": 38,
+        "title": "Preparing training data",
+        "scope": "Task definition, examples, chat schemas, formatting, chat templates, EOS tokens, packing, truncation, response-only loss/masking, deduplication, held-out tests, and synthetic-data checks."
+      },
+      {
+        "id": 39,
+        "title": "Full training workflow",
+        "scope": "Baseline → data → configuration → short sanity run → validation → checkpoint → held-out evaluation → export → serving. Learning rate, epochs, accumulation, checkpointing, optimizer states, and memory overhead."
+      },
+      {
+        "id": 40,
+        "title": "Local training limits",
+        "scope": "CPU versus GPU feasibility, tiny educational models versus useful pretrained models, hardware-dependent capacity, resumability, reproducibility, overfitting, forgetting, and licensing."
+      }
+    ],
+    "anchor": "Training a tiny model from scratch can teach the process; it does not reproduce the broad capabilities of a large pretrained model. Fine-tuning is usually a more practical local adaptation exercise.",
+    "lab": "Concept lab: prepare 50–100 fictional examples and a separate test set for a narrow formatting task. Optional execution: run a short compatible fine-tuning recipe and compare with a strong prompt baseline. Treat this dataset size as instructional, not a production prescription.",
+    "checkpoint": "If the need is fresh factual knowledge, why might retrieval be a better first experiment than training?",
+    "sources": [
+      "[torchtune dataset overview](https://meta-pytorch.org/torchtune/stable/basics/datasets_overview.html)"
+    ],
+    "id": 10
+  },
+  {
+    "title": "LoRA, QLoRA, and adapters",
+    "lessons": [
+      {
+        "id": 41,
+        "title": "Parameter-efficient fine-tuning",
+        "scope": "Frozen base weights, trainable adapters, LoRA's low-rank update intuition, target modules, rank, alpha, dropout, and parameter/memory tradeoffs."
+      },
+      {
+        "id": 42,
+        "title": "QLoRA",
+        "scope": "Training adapters with a quantized frozen base; storage and compute precision; dequantization during computation; why this is not simply updating all weights in four-bit precision."
+      },
+      {
+        "id": 43,
+        "title": "The adapter lifecycle",
+        "scope": "Saving/loading adapters, matching exact base revisions, tokenizer compatibility, separate adapters versus merging, re-quantization, switching adapters, and verifying exported results."
+      },
+      {
+        "id": 44,
+        "title": "Alternatives and limits",
+        "scope": "Prompt/prefix tuning, other adapter methods, DoRA as an extension, full fine-tuning tradeoffs, adapter interference, and why more rank or more epochs is not automatically better."
+      }
+    ],
+    "anchor": "LoRA trains a relatively small set of added parameters. QLoRA combines adapter training with a quantized base to reduce resource requirements. Neither removes the need for good examples and independent evaluation.",
+    "lab": "Optional execution: train one small adapter for the Module 10 task on compatible hardware. Compare the base model, prompted base model, and adapted model on untouched tests. Save configuration and base revision. If merging is supported, test the merged artifact separately.",
+    "checkpoint": "What files must travel with an adapter so another machine can reproduce your result?",
+    "sources": [
+      "[PEFT LoRA reference](https://huggingface.co/docs/peft/en/developer_guides/lora)",
+      "[PEFT quantization](https://huggingface.co/docs/peft/en/developer_guides/quantization)"
+    ],
+    "id": 11
+  },
+  {
+    "title": "Post-training, alignment, and distributed training",
+    "lessons": [
+      {
+        "id": 45,
+        "title": "Instruction and preference training",
+        "scope": "Supervised instruction tuning, preference pairs, reward models, RLHF, RLAIF, DPO, and why user preference is not identical to truth."
+      },
+      {
+        "id": 46,
+        "title": "Reinforcement learning for models",
+        "scope": "Policy, rollout, reward, verifiable outcomes, PPO/GRPO as algorithm families, reward hacking, evaluation gaming, and reasoning-oriented post-training—without derivations."
+      },
+      {
+        "id": 47,
+        "title": "Learning from other models",
+        "scope": "Response/logit distillation, synthetic curricula, rejection sampling, data diversity, verification, and compounding errors when synthetic outputs are used uncritically."
+      },
+      {
+        "id": 48,
+        "title": "Training at scale",
+        "scope": "Data, tensor, pipeline, and expert parallelism; sharding, FSDP/ZeRO, communication overhead, checkpoint recovery, experiment tracking, compute/data budgets, and scaling-law intuition."
+      }
+    ],
+    "anchor": "Post-training changes behavior through objectives and examples. Optimizing a proxy can reward shortcuts, so separate evaluation remains necessary.",
+    "lab": "Write preference pairs where a fluent answer is wrong and a less polished answer is correct. Design a reward rule and identify three ways it could be gamed. Diagram how two machines could divide a training job.",
+    "checkpoint": "Why can a model improve on a reward score while becoming less useful to people?",
+    "id": 12
+  },
+  {
+    "title": "Retrieval, embeddings, and knowledge systems",
+    "lessons": [
+      {
+        "id": 49,
+        "title": "Search building blocks",
+        "scope": "Embedding models, similarity intuition, keyword/BM25 search, vector indexes/databases, approximate retrieval, hybrid search, metadata filters, and rerankers."
+      },
+      {
+        "id": 50,
+        "title": "Building RAG",
+        "scope": "Ingestion, parsing, OCR, chunking, overlap, metadata, indexing, retrieval, reranking, context assembly, citations, and source permissions."
+      },
+      {
+        "id": 51,
+        "title": "Advanced retrieval",
+        "scope": "Query rewriting, decomposition, multi-hop retrieval, structured databases/SQL, knowledge graphs/GraphRAG, multimodal retrieval, and choosing among RAG, long context, and fine-tuning."
+      },
+      {
+        "id": 52,
+        "title": "Retrieval evaluation and freshness",
+        "scope": "Recall/precision conceptually, retrieval versus generation errors, stale documents, contradictions, updates/deletions, provenance, permission filtering, and citation verification."
+      }
+    ],
+    "anchor": "RAG supplies retrieved information at answer time. It can fail before generation if the right material was never retrieved or the wrong person was allowed to retrieve it.",
+    "lab": "Use five public or fictional documents. Include a superseded version and an unanswered question. Manually simulate retrieval first; optionally implement indexing later. Score retrieval success separately from answer correctness.",
+    "checkpoint": "If the correct document exists but was not retrieved, will a better generation prompt necessarily fix the answer?",
+    "id": 13
+  },
+  {
+    "title": "APIs, tools, MCP, and integrations",
+    "lessons": [
+      {
+        "id": 53,
+        "title": "API fundamentals for AI",
+        "scope": "Requests/responses, authentication, messages, streaming, errors, retries, timeouts, rate limits, usage, and compatibility differences. Read examples without requiring coding."
+      },
+      {
+        "id": 54,
+        "title": "Structured outputs and tools",
+        "scope": "JSON/schema, constrained decoding, validation, function calling, tool choice, argument checks, execution results, and distinguishing well-formed output from correct content."
+      },
+      {
+        "id": 55,
+        "title": "MCP and connectors",
+        "scope": "Host/client/server roles; tools, resources, prompts, discovery, transport, authentication boundaries, and the distinction between MCP, an API, and an agent framework."
+      },
+      {
+        "id": 56,
+        "title": "Reliable external actions",
+        "scope": "Read versus write operations, permissions, idempotency, duplicate prevention, partial failures, audit trails, and verifying the actual external result."
+      }
+    ],
+    "anchor": "The model can request an action; software executes it. A generated claim of success is not a substitute for the tool's observed result.",
+    "lab": "Trace a fictional appointment lookup through an API and a tool call. Add malformed arguments, a timeout, and a repeated request. Specify how to avoid creating duplicates. No real messages or bookings are needed.",
+    "checkpoint": "What should happen if the action succeeded but the response was lost?",
+    "sources": [
+      "[Official MCP introduction](https://modelcontextprotocol.io/docs/getting-started/intro)"
+    ],
+    "id": 14
+  },
+  {
+    "title": "Agents, harnesses, and multi-agent systems",
+    "lessons": [
+      {
+        "id": 57,
+        "title": "Agent fundamentals",
+        "scope": "Chatbot versus workflow versus agent; observe/plan/act/inspect loops; decomposition, tool selection, stopping rules, budgets, and human intervention."
+      },
+      {
+        "id": 58,
+        "title": "What a harness does",
+        "scope": "Message assembly, state machine, execution environment, tool dispatch, scheduling, retries, cancellation, persistence, resumability, logging, permissions, and sandboxing."
+      },
+      {
+        "id": 59,
+        "title": "Skills and coordination",
+        "scope": "Reusable instructions/scripts, project rules, hooks, subagents, delegation, shared state, handoffs, parallel work, coordinator patterns, conflict resolution, and communication overhead."
+      },
+      {
+        "id": 60,
+        "title": "Agents in practice",
+        "scope": "Coding agents, browser/computer use, research agents, durable jobs, background execution, environment feedback, checkpoint recovery, and verifying completion beyond the final message."
+      }
+    ],
+    "anchor": "The same model can behave very differently inside different harnesses. The harness determines which information and actions are available and how execution continues or recovers.",
+    "lab": "Design a read-only research agent with a state diagram. Specify tools, permissions, budgets, memory, failure recovery, and completion evidence. Compare it with a fixed workflow and justify the extra autonomy.",
+    "checkpoint": "Which failures require a different model, and which require a better harness?",
+    "sources": [
+      "[Workflow and agent patterns](https://www.anthropic.com/engineering/building-effective-agents)"
+    ],
+    "id": 15
+  },
+  {
+    "title": "Vision, image generation, and video",
+    "lessons": [
+      {
+        "id": 61,
+        "title": "Understanding visual input",
+        "scope": "Image classification, detection, segmentation, OCR, visual embeddings, vision-language models, spatial reasoning, documents/charts, and resolution limits."
+      },
+      {
+        "id": 62,
+        "title": "Generating images",
+        "scope": "Autoregressive, diffusion, and flow-matching approaches conceptually; latent representations, conditioning, guidance, sampling steps, seeds, and reproducibility."
+      },
+      {
+        "id": 63,
+        "title": "Editing and adapting images",
+        "scope": "Image-to-image, inpainting, outpainting, reference conditioning, control signals, image adapters/LoRA, identity/style consistency, and evaluation beyond aesthetic appeal."
+      },
+      {
+        "id": 64,
+        "title": "Video and 3D",
+        "scope": "Frame sampling versus continuous understanding, temporal consistency, video generation/editing, motion, basic 3D representations, world models, and separating a plausible simulation from validated physical reasoning."
+      }
+    ],
+    "anchor": "Understanding and generating media are separate capabilities. Visually convincing output can still be spatially, temporally, or factually wrong.",
+    "lab": "Ask a model to separate observations from inferences about a public image. Inspect small text and counts manually. Design a short video evaluation rubric covering consistency and motion.",
+    "checkpoint": "What could be missed when a video system analyzes only sampled frames?",
+    "id": 16
+  },
+  {
+    "title": "Audio, speech, real-time AI, and embodied systems",
+    "lessons": [
+      {
+        "id": 65,
+        "title": "Speech input",
+        "scope": "Speech recognition, language identification, diarization, timestamps, accents, noise, domain vocabulary, and transcription-versus-translation errors."
+      },
+      {
+        "id": 66,
+        "title": "Speech output and media",
+        "scope": "Text-to-speech, voice conditioning, prosody, voice conversion, dubbing, synchronization, music generation, provenance, and consent."
+      },
+      {
+        "id": 67,
+        "title": "Real-time assistants",
+        "scope": "Streaming audio, voice activity detection, turn-taking, interruptions, latency budgets, speech pipelines versus native audio models, and recovery from mishearing."
+      },
+      {
+        "id": 68,
+        "title": "Embodied and decision systems",
+        "scope": "Reinforcement learning beyond LLMs, imitation learning, perception/planning/control, robotics, simulators, sim-to-real transfer, edge/on-device AI, federated learning, and physical constraints."
+      }
+    ],
+    "anchor": "A good transcript is only one part of a useful voice assistant; timing, interruptions, and correct action selection matter too.",
+    "lab": "Use a short non-sensitive recording or a fictional transcript with an ambiguous name. Trace where transcription, interpretation, or execution could fail. Design a confirmation rule for consequential voice actions.",
+    "checkpoint": "Why is success in a simulator insufficient to establish safe real-world robot behavior?",
+    "id": 17
+  },
+  {
+    "title": "Evaluation, debugging, and research literacy",
+    "lessons": [
+      {
+        "id": 69,
+        "title": "Designing evaluations",
+        "scope": "Task definitions, rubrics, representative datasets, baseline comparisons, blind review, held-out cases, regressions, human evaluation, and model-as-judge limitations."
+      },
+      {
+        "id": 70,
+        "title": "Reading metrics",
+        "scope": "Accuracy, precision/recall, F1, ranking quality, calibration, perplexity, latency percentiles, cost per successful task, and uncertainty—all interpreted through examples, not formulas."
+      },
+      {
+        "id": 71,
+        "title": "Debugging the whole system",
+        "scope": "Traces, data quality, retrieval, prompt, model, tools, environment, one-variable experiments, ablations, reproducibility, seed limits, and failure taxonomies."
+      },
+      {
+        "id": 72,
+        "title": "Reading papers and benchmarks",
+        "scope": "Research question, baseline, dataset, method, compute, ablations, limitations, benchmark contamination, leaderboard overfitting, reproducibility, and separating evidence from speculation."
+      }
+    ],
+    "anchor": "Evaluation should measure the behavior you need. A public leaderboard is not a substitute for testing your inputs and constraints.",
+    "lab": "Make a 20-case suite containing normal, ambiguous, missing-evidence, multilingual, long-context, and adversarial cases. Predefine critical failures and keep them separate from average scores.",
+    "checkpoint": "What would make a claimed improvement unconvincing even if the average score increased?",
+    "id": 18
+  },
+  {
+    "title": "Security, privacy, safety, and governance",
+    "lessons": [
+      {
+        "id": 73,
+        "title": "Threats to AI applications",
+        "scope": "Direct/indirect prompt injection, jailbreaks, data exfiltration, poisoned retrieval, training-data poisoning, supply-chain risk, unsafe tool execution, and credential exposure."
+      },
+      {
+        "id": 74,
+        "title": "System boundaries",
+        "scope": "Least privilege, sandboxing, data/instruction separation, tenant isolation, validation, approvals for consequential actions, secret handling, and why prompting alone is insufficient defense."
+      },
+      {
+        "id": 75,
+        "title": "Data and people",
+        "scope": "Retention, training use, access controls, local-versus-cloud data flow, consent, privacy leakage, bias, accessibility, attribution, copyright/licensing questions, and human oversight."
+      },
+      {
+        "id": 76,
+        "title": "Governance and societal effects",
+        "scope": "Model/data/system cards, auditability, incident response, red teaming, release criteria, misuse, misinformation, labor effects, environmental costs, and jurisdiction-specific policy research."
+      }
+    ],
+    "anchor": "Safety is a property of the deployed system and its use, not merely whether a model refused one harmful prompt. Current legal obligations need jurisdiction-specific verification.",
+    "lab": "Threat-model the research agent using fictional data. Identify assets, untrusted inputs, actions, failure consequences, boundaries, and observable tests. Do not test against systems without authorization.",
+    "checkpoint": "If a malicious source says it has permission to send private data, which component must prevent that action?",
+    "id": 19
+  },
+  {
+    "title": "Production, economics, and final projects",
+    "lessons": [
+      {
+        "id": 77,
+        "title": "Product and system design",
+        "scope": "User need, task boundaries, human review, graceful fallback, uncertainty communication, accessibility, deterministic components, and deciding when AI adds value."
+      },
+      {
+        "id": 78,
+        "title": "Operating in production",
+        "scope": "Versioned prompts/models/data, deployment, monitoring, drift, observability, feedback loops, regression gates, canaries, rollback, incident handling, and service reliability."
+      },
+      {
+        "id": 79,
+        "title": "Economics and deployment choices",
+        "scope": "Local/cloud/hybrid tradeoffs; input/output/tool/cache costs; GPU utilization; quotas; batching; routing; total ownership cost; vendor dependency; and cost per successful outcome."
+      },
+      {
+        "id": 80,
+        "title": "Integration and continuing learning",
+        "scope": "Finish the capstones, explain the entire lifecycle, defend choices against alternatives, document limits, and maintain a topic backlog based on evidence rather than every new acronym."
+      }
+    ],
+    "anchor": "A successful AI product reliably accomplishes a useful task within acceptable cost and risk. A strong model is one component of that outcome.",
+    "lab": "Complete the capstones listed in the course home. Produce a design, comparison baseline, test results, failure analysis, operating boundaries, and an improvement plan.",
+    "checkpoint": "Can another person reproduce your result and identify when the system should not be trusted?",
+    "id": 20
+  }
+]

@@ -1,0 +1,17 @@
+name: ai-learning-lab
+services:
+  ai-learning-lab:
+    image: node:22-alpine
+    working_dir: /app
+    command: ["node", "server.mjs"]
+    user: "1000:1000"
+    environment:
+      BIND_ADDRESS: 0.0.0.0
+    ports:
+      - "127.0.0.1:4318:4318"
+    volumes:
+      - ./:/app:ro
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
