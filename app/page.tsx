@@ -8,6 +8,17 @@ type Progress = {done:number[]; bookmarks:number[]; notes:Record<string,string>;
 type Message = {role:"user"|"assistant";text:string};
 const blank:Progress={done:[],bookmarks:[],notes:{},answers:{},last:1};
 const lessons=course.flatMap(m=>m.lessons.map(l=>({...l,module:m.id})));
+const validId=(n:unknown):n is number=>Number.isInteger(n)&&(n as number)>=1&&(n as number)<=lessons.length;
+const isRecord=(o:unknown):o is Record<string,unknown>=>typeof o==="object"&&o!==null&&!Array.isArray(o);
+// Saved or imported progress is untrusted: keep only values the app can render.
+function clean(v:unknown):Progress|null{
+ if(!isRecord(v)||!Array.isArray(v.done)||!Array.isArray(v.bookmarks)||!isRecord(v.notes)||!isRecord(v.answers))return null;
+ const ids=(a:unknown[])=>[...new Set(a.filter(validId))];
+ const notes:Record<string,string>={},answers:Record<string,number>={};
+ for(const [k,n] of Object.entries(v.notes))if(validId(Number(k))&&typeof n==="string")notes[k]=n;
+ for(const [k,n] of Object.entries(v.answers))if(validId(Number(k))&&[0,1,2].includes(n as number))answers[k]=n as number;
+ return {done:ids(v.done),bookmarks:ids(v.bookmarks),notes,answers,last:validId(v.last)?v.last:1};
+}
 const stages=["Foundations","Models & context","Local AI & training","Systems & agents","Beyond text","Real-world practice"];
 const stageFor=(id:number)=>id<=2?0:id<=6?1:id<=12?2:id<=15?3:id<=17?4:5;
 const key="fieldnotes-progress-v1";
@@ -16,14 +27,14 @@ export default function Home(){
  const controller=useRef<AbortController|null>(null),inputFile=useRef<HTMLInputElement>(null),chatEnd=useRef<HTMLDivElement>(null);
  const lesson=lessons.find(l=>l.id===id)!, mod=course[lesson.module-1],check=learning.checks[mod.id-1],answer=p.answers[id],chat=messages[id]||[];
  const options=[check[1],check[2],check[3]].map((_,i)=>[check[1],check[2],check[3]][(i+id)%3]);
- useEffect(()=>{try{const saved=JSON.parse(localStorage.getItem(key)||"null");if(saved&&Array.isArray(saved.done)&&Array.isArray(saved.bookmarks)&&typeof saved.notes==="object"&&typeof saved.answers==="object"){setP({...blank,...saved});setId(saved.last>=1&&saved.last<=80?saved.last:1)}}catch{}setLoaded(true);fetch("/api/tutor/status").then(r=>r.ok?r.json():{connected:false}).then((s:unknown)=>setStatus((s as {connected?:boolean}).connected?"ready":"offline")).catch(()=>setStatus("offline"))},[]);
+ useEffect(()=>{try{const saved=clean(JSON.parse(localStorage.getItem(key)||"null"));if(saved){setP(saved);setId(saved.last)}}catch{}setLoaded(true);fetch("/api/tutor/status").then(r=>r.ok?r.json():{connected:false}).then((s:unknown)=>setStatus((s as {connected?:boolean}).connected?"ready":"offline")).catch(()=>setStatus("offline"))},[]);
  useEffect(()=>{if(loaded){try{localStorage.setItem(key,JSON.stringify(p))}catch{setNotice("Storage is unavailable. Export your progress before leaving.")}}},[p,loaded]);
  useEffect(()=>{chatEnd.current?.scrollIntoView({behavior:"smooth",block:"nearest"})},[chat,busy]);
  useEffect(()=>{if(!notice)return;const t=setTimeout(()=>setNotice(""),5000);return()=>clearTimeout(t)},[notice]);
  function openLesson(n:number){if(busy){controller.current?.abort();setBusy(false)}setId(n);setP(v=>({...v,last:n}));setView("lesson");setTab("learn");setQuery("");setMobile(false);setError("");window.scrollTo({top:0,behavior:"smooth"})}
  function toggle(field:"done"|"bookmarks",n:number){setP(v=>({...v,[field]:v[field].includes(n)?v[field].filter(x=>x!==n):[...v[field],n]}))}
  function exportProgress(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify({version:1,progress:p},null,2)],{type:"application/json"}));a.download="ai-learning-lab-progress.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
- async function importProgress(file:File|undefined){if(!file)return;try{if(file.size>1_000_000)throw Error();const data=JSON.parse(await file.text()),v=data.progress;if(data.version!==1||!v||![v.done,v.bookmarks].every(a=>Array.isArray(a)&&a.every((n:unknown)=>Number.isInteger(n)&&Number(n)>=1&&Number(n)<=80))||!v.notes||Array.isArray(v.notes)||Object.values(v.notes).some(n=>typeof n!=="string")||!v.answers||Array.isArray(v.answers)||Object.values(v.answers).some(n=>![0,1,2].includes(Number(n))))throw Error();setP({...blank,...v});setNotice("Progress restored successfully.")}catch{setNotice("That file is not a valid AI Learning Lab progress export.")}if(inputFile.current)inputFile.current.value=""}
+ async function importProgress(file:File|undefined){if(!file)return;try{if(file.size>1_000_000)throw Error();const data=JSON.parse(await file.text()),v=data?.version===1?clean(data.progress):null;if(!v)throw Error();setP(v);setId(v.last);setNotice("Progress restored successfully.")}catch{setNotice("That file is not a valid AI Learning Lab progress export.")}if(inputFile.current)inputFile.current.value=""}
  async function ask(text=question){if(!text.trim()||busy)return;setTutor(true);setError("");const target=id,old=(messages[target]||[]).filter(m=>m.text.trim()),next=[...old,{role:"user" as const,text:text.trim()}];setMessages(v=>({...v,[target]:[...next,{role:"assistant",text:""}]}));setQuestion("");setBusy(true);const ac=new AbortController();controller.current=ac;
  try{const r=await fetch("/api/tutor",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:target,messages:next.slice(-12)}),signal:ac.signal});if(!r.ok){const e=await r.json().catch(()=>({error:"Tutor unavailable. Open the local study studio to use Codex."}));throw Error((e as {error:string}).error)}const reader=r.body!.getReader(),decoder=new TextDecoder();let buffer="",full="";for(;;){const {done,value}=await reader.read();if(done)break;buffer+=decoder.decode(value,{stream:true});const rows=buffer.split("\n");buffer=rows.pop()!;for(const row of rows){if(!row)continue;const ev=JSON.parse(row);if(ev.error)throw Error(ev.error);if(ev.delta){full+=ev.delta;setMessages(v=>({...v,[target]:[...next,{role:"assistant",text:full}]}))}}}if(!full)throw Error("No answer was returned. Please try again.")}
  catch(e){if((e as Error).name!=="AbortError")setError((e as Error).message);else setError("Response stopped. You can ask again.")}
