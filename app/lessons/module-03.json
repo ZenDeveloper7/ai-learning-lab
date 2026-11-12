@@ -1,0 +1,114 @@
+[
+  {
+    "id": 9,
+    "explanation": [
+      "A neural network transforms input through layers into representations useful for a task. An embedding represents an item with numbers so relationships can be compared. The numbers are not a dictionary definition or a guarantee of factual meaning.",
+      "Different architectures organize information differently. Convolutional networks exploit local patterns; recurrent networks process sequences through state; transformers use attention. Architecture is a design choice, not a ranking by itself."
+    ],
+    "mechanism": [
+      "A layer transforms an input representation into another representation. An activation is an intermediate value produced during that processing; an activation function can introduce nonlinearity so the network expresses more than a simple linear transformation. Embeddings represent items as lists of learned numbers useful for comparison or further processing.",
+      "CNNs emphasize local patterns and shared filters; RNNs carry state across sequence steps. Transformers use attention to combine information across positions. State-space models maintain structured evolving state, and hybrids combine mechanisms. No architecture is universally best for every task."
+    ],
+    "example": [
+      "A photo classifier processes an image into progressively transformed features.",
+      "Some features may respond to edges or textures, and later combinations help distinguish a bicycle from a motorcycle. These features are learned, not a hand-written checklist of every vehicle.",
+      "An unusual camera angle can still defeat the learned representation."
+    ],
+    "use": "Use architecture vocabulary to understand what a model is designed to process and what resource tradeoffs to investigate.",
+    "caution": "An embedding coordinate is not usually a neatly labeled human concept such as ‘friendliness.’ Meaning is distributed across the representation.",
+    "question": "Would a useful embedding model necessarily be able to write a paragraph?",
+    "answer": "No. It may only map inputs into vectors for comparison. Generating text requires a model and output interface designed for generation.",
+    "title": "Neural networks intuitively",
+    "scope": "Layers, activations, representations, embeddings, and the conceptual roles of CNNs, RNNs, transformers, and state-space/hybrid models.",
+    "sources": [
+      {
+        "label": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "explanation": [
+      "A tokenizer turns text into units a model can process. A common word may be one token while an unusual name becomes several pieces. Spaces, punctuation, code, and different languages affect the count.",
+      "Tokens determine input capacity and often usage costs. Never assume a fixed word-to-token conversion across languages. Special tokens can signal boundaries or roles, and the model expects the correct template."
+    ],
+    "mechanism": [
+      "A tokenizer converts input into token IDs from a vocabulary. Tokens may be words, word fragments, punctuation, or other units; special tokens mark boundaries and roles. Different tokenizers split the same sentence differently, especially across languages and code.",
+      "Media can be represented through image patches, audio units, or other model-specific encodings. Their budget accounting is not reliably inferred from text length. Use the actual tokenizer or provider's accounting rather than assuming a fixed number of characters per token."
+    ],
+    "example": [
+      "A user pastes an English paragraph and a similarly sized paragraph in another language.",
+      "The tokenizer produces different token counts. An app that limits only characters can unexpectedly exceed its model budget.",
+      "The app measures the actual request, including hidden instructions and reserved output space, before sending it."
+    ],
+    "use": "Tokenization matters for context limits, billing, truncation, dataset preparation, and reproducing another person's model run.",
+    "caution": "A token is not always a word, and tokens from one model's tokenizer cannot be assumed to map to another's vocabulary.",
+    "question": "Why can counting the letters in a word be awkward for a text model?",
+    "answer": "The model may process the word as one or several subword tokens rather than individual letters. A character-counting tool is more dependable for exact counts.",
+    "title": "Tokens and tokenizers",
+    "scope": "Subwords, vocabulary, special tokens, multilingual tokenization, text versus media tokens, token budgets, and why character/word counts are imperfect proxies.",
+    "sources": [
+      {
+        "label": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "explanation": [
+      "Attention lets a position combine information from other positions. In 'the animal was tired because it ran,' relationships between words help represent what 'it' refers to. This is computation, not human awareness.",
+      "An encoder builds representations of input; a decoder can generate a sequence. Causal masking prevents a text-generating decoder from using future tokens during its prediction task. Positional information distinguishes different word orders."
+    ],
+    "mechanism": [
+      "Attention lets each position combine information from other permitted positions. Positional information helps distinguish order: ‘dog bites person’ differs from ‘person bites dog.’ Representations are contextual because a token's meaning depends on its surrounding input.",
+      "An encoder builds representations of input, often with access to both earlier and later positions. A causal decoder generates sequentially and masks future positions during training. An encoder-decoder uses an encoded input to guide generated output, as in many translation systems."
+    ],
+    "example": [
+      "Consider ‘I deposited money at the bank’ and ‘We sat on the river bank.’",
+      "The surrounding words provide different evidence for the same word. Attention can help combine that evidence into different contextual representations.",
+      "During generation, a causal decoder can use the prompt and tokens already produced, but cannot inspect a future answer that has not been generated."
+    ],
+    "use": "Use this mental model to understand why wording, ordering, and available context affect results without treating attention as literal human focus.",
+    "caution": "An attention pattern is not a complete or guaranteed explanation of why a model made a decision.",
+    "question": "Why are future tokens hidden during next-token training?",
+    "answer": "Otherwise the model could use the answer it is supposed to predict, creating a training shortcut unavailable during generation.",
+    "title": "Inside a transformer",
+    "scope": "Attention, positional information, encoder, decoder, encoder-decoder, causal masking, and contextual representations; diagrams rather than matrix calculations.",
+    "sources": [
+      {
+        "label": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "explanation": [
+      "A dense model generally uses its main parameter blocks for every token. A mixture-of-experts model routes tokens through selected expert blocks. The total parameter count can therefore differ greatly from the number active per token.",
+      "Hardware, routing, context, and software all affect cost. A model advertised with more parameters is not automatically better for your task. Likewise, a large supported context window does not prove reliable retrieval of every detail."
+    ],
+    "mechanism": [
+      "A dense model uses its main parameter blocks for each token. A mixture-of-experts model has a router that selects some expert blocks per token. Total parameters describe all stored weights; active parameters describe the selected computation, with shared components also involved.",
+      "Fewer active parameters can reduce arithmetic without proportionally reducing weight storage or communication. Model capability also depends on data, training, architecture, and task fit. A longer supported context limit says what fits, not how accurately the model uses every part."
+    ],
+    "example": [
+      "Two model downloads advertise similar active parameter counts.",
+      "One is dense; the other stores many experts and needs substantially more memory even though only a subset is selected per token.",
+      "A laptop user checks total footprint and runtime support instead of assuming equal hardware needs."
+    ],
+    "use": "Compare measured task quality, memory, and latency on your actual workload. Treat parameter counts as descriptive inputs rather than a purchase decision.",
+    "caution": "Extending a context limit does not guarantee reliable reasoning over a long, contradictory document collection.",
+    "question": "Can a model with fewer active parameters still need more memory?",
+    "answer": "Yes. It may store many inactive expert weights, plus caches and runtime buffers. Active computation and resident storage are different quantities.",
+    "title": "Architecture tradeoffs",
+    "scope": "Dense versus mixture-of-experts; total versus active parameters; routing; model size versus capability; context extension versus effective long-context use.",
+    "sources": [
+      {
+        "label": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762"
+      }
+    ]
+  }
+]

@@ -1,0 +1,94 @@
+[
+  {
+    "id": 37,
+    "explanation": [
+      "Prompting changes instructions. Retrieval supplies evidence. Fine-tuning changes learned behavior through further training. Continued pretraining extends broad modeling on new material; supervised fine-tuning uses task examples.",
+      "Start with the least complex approach that solves the problem. Frequently changing factual documents usually need retrieval. Repeated formatting or behavioral patterns may be candidates for fine-tuning."
+    ],
+    "mechanism": [
+      "Prompting changes the current instructions; retrieval supplies external evidence; tools provide computation or actions. Fine-tuning changes learned behavior using examples. Continued pretraining exposes a pretrained model to more raw domain data, while training from scratch learns from an initial untrained state.",
+      "Parameter-efficient fine-tuning updates a restricted set of parameters, reducing some training costs. These methods can be combined. Choose the smallest intervention that addresses the observed failure, and compare it with a baseline before committing to training."
+    ],
+    "example": [
+      "A support assistant uses an outdated return policy and writes overly long answers.",
+      "Retrieval supplies the current policy. Clear instructions or fine-tuning on concise approved answers address style.",
+      "Training solely to memorize a policy that changes weekly would create an avoidable maintenance problem."
+    ],
+    "use": "Use retrieval for changing facts, tools for exact external operations, and fine-tuning for recurring behavioral or task adaptation when examples and evaluation justify it.",
+    "caution": "Fine-tuning does not create guaranteed factual storage or grant access to your databases.",
+    "question": "Which approach fits calculating an invoice total exactly?",
+    "answer": "A deterministic calculation tool or ordinary application code. A model can interpret the request or explain the result, but exact arithmetic should be verified.",
+    "title": "Choosing the adaptation method",
+    "scope": "Training from scratch, continued pretraining, supervised fine-tuning, parameter-efficient fine-tuning, prompting, retrieval, and tool access: what each changes and when each fits.",
+    "sources": []
+  },
+  {
+    "id": 38,
+    "explanation": [
+      "Training examples must match the format used by the trainer and model. Chat templates, turn boundaries, truncation, and which tokens contribute to loss all affect what is learned.",
+      "Reserve test cases before experimentation. Remove near-duplicates across splits. A dataset full of polished but incorrect synthetic answers can teach confident mistakes."
+    ],
+    "mechanism": [
+      "Training examples must represent the task you want at inference time. Chat schemas identify roles, and chat templates serialize them into the model's expected token sequence. EOS means end of sequence and helps define completion boundaries. Truncation can accidentally remove the answer.",
+      "Packing combines examples into longer sequences for efficiency, with boundary handling depending on the trainer. Response-only loss masks non-answer tokens from the objective. Deduplicate before creating independent held-out sets, and review synthetic examples for correctness, diversity, and unwanted style."
+    ],
+    "example": [
+      "A dataset contains customer questions followed by approved answers.",
+      "A formatting bug labels customer text as assistant output, teaching the model to imitate complaints. A tiny inspected batch reveals the error before a long run.",
+      "The team checks decoded training sequences, masks, and retained answers rather than only checking that JSON parses."
+    ],
+    "use": "Inspect actual tokenized examples and a small training batch. Preserve a clean held-out set of realistic requests.",
+    "caution": "Valid JSON is not sufficient: roles, boundaries, masks, and target content can all be wrong while the file remains well formed.",
+    "question": "What happens if long prompts are retained but their answers are truncated away?",
+    "answer": "The intended supervision may disappear or become misleading. Adjust lengths, filtering, or preprocessing and inspect the resulting examples.",
+    "title": "Preparing training data",
+    "scope": "Task definition, examples, chat schemas, formatting, chat templates, EOS tokens, packing, truncation, response-only loss/masking, deduplication, held-out tests, and synthetic-data checks.",
+    "sources": []
+  },
+  {
+    "id": 39,
+    "explanation": [
+      "Establish a baseline, prepare data, run a tiny sanity check, train, validate, save, and evaluate on held-out examples. Record settings so the result can be reproduced.",
+      "Training needs memory for more than weights: activations, gradients, and optimizer state can dominate. Gradient accumulation and checkpointing trade time and memory in different ways."
+    ],
+    "mechanism": [
+      "Begin with an evaluated baseline. Prepare data and configuration, run a short sanity check, inspect validation, save recoverable checkpoints, and only then scale the run. Finish with held-out evaluation and a serving test of the exported artifact.",
+      "Gradient accumulation combines contributions from smaller batches before an update. Gradient checkpointing saves memory by recomputing some intermediate values. Optimizer states and gradients add memory beyond weights; a resumable training checkpoint may include those states, scheduler position, and randomness state."
+    ],
+    "example": [
+      "A fine-tuning job lowers training loss but exports a model that serves garbled role tokens.",
+      "The training artifact was tested internally, but export used the wrong tokenizer/template.",
+      "A final inference test with the exact deployment package catches the mismatch before users see it."
+    ],
+    "use": "Treat training, evaluation, export, and serving as one reproducible workflow. Track configuration and artifact versions at every stage.",
+    "caution": "Saving weights alone may support inference without supporting faithful training resumption.",
+    "question": "Why run a tiny sanity job first?",
+    "answer": "It catches formatting, loss, memory, and checkpoint problems cheaply. It does not establish final quality, but avoids scaling a broken setup.",
+    "title": "Full training workflow",
+    "scope": "Baseline → data → configuration → short sanity run → validation → checkpoint → held-out evaluation → export → serving. Learning rate, epochs, accumulation, checkpointing, optimizer states, and memory overhead.",
+    "sources": []
+  },
+  {
+    "id": 40,
+    "explanation": [
+      "Training a tiny model from scratch can demonstrate the lifecycle on ordinary hardware. It does not recreate the broad knowledge of a large pretrained model. Adapting a small existing model is often the more useful experiment.",
+      "Choose a narrow task, monitor validation, and stop if performance degrades. Report what changed on unrelated tasks as well as the target task."
+    ],
+    "mechanism": [
+      "Training usually requires more memory than inference because it tracks information needed for updates. Full fine-tuning can add gradients, optimizer states, and activations; adapter methods reduce some of this overhead, not all of it. CPU training is possible for small exercises, while useful larger workloads depend heavily on acceleration and time budgets.",
+      "Use tiny educational models to understand the process, and pretrained models when learning practical adaptation. Save resumable checkpoints, monitor held-out behavior, and review licenses for both base artifacts and data. Local execution alone does not guarantee successful learning."
+    ],
+    "example": [
+      "A learner can run a quantized model on a laptop and assumes full training will also fit.",
+      "The first training step runs out of memory because additional states and activations are required.",
+      "They reduce sequence length and batch size or choose supported adapter training, then test whether the resulting workload is still useful."
+    ],
+    "use": "Estimate peak training memory and run a short measured experiment before planning a long local job. Prefer a small valid experiment over an oversized failing one.",
+    "caution": "There is no universal rule that a particular RAM amount can train every model of a given parameter count.",
+    "question": "Why evaluate general tasks after domain adaptation?",
+    "answer": "To detect forgetting or unwanted behavior changes. Improvement on your narrow training examples can coexist with regression elsewhere.",
+    "title": "Local training limits",
+    "scope": "CPU versus GPU feasibility, tiny educational models versus useful pretrained models, hardware-dependent capacity, resumability, reproducibility, overfitting, forgetting, and licensing.",
+    "sources": []
+  }
+]

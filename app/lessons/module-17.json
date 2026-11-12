@@ -1,0 +1,94 @@
+[
+  {
+    "id": 65,
+    "explanation": [
+      "Speech recognition converts audio to text. Diarization estimates who spoke when. Language identification and timestamps add different metadata. Noise, accents, and uncommon names can cause errors.",
+      "A readable transcript may silently replace an unfamiliar name with a familiar one. Verify details before using the transcript to take action."
+    ],
+    "mechanism": [
+      "Automatic speech recognition converts audio into text. Language identification estimates the spoken language, diarization separates speaker segments, and timestamps align text with time. These are distinct tasks and can fail independently.",
+      "Accents, background noise, overlapping speakers, uncommon names, and technical vocabulary affect accuracy. Transcription preserves spoken language; translation expresses meaning in another language and adds another opportunity for error. Confidence indicators should guide review but are not infallible."
+    ],
+    "example": [
+      "A meeting transcript attributes ‘Do not release this version’ to the wrong speaker and drops the word ‘not.’",
+      "The text remains grammatical but reverses the decision.",
+      "Reviewing the relevant audio segment and speaker labels corrects two separate errors before the notes are shared."
+    ],
+    "use": "Use timestamps to verify important names, numbers, decisions, and negations. Evaluate on the actual accents and recording conditions.",
+    "caution": "A low average word error rate can still hide one high-impact error in a name, dosage, amount, or negation.",
+    "question": "Does diarization necessarily identify a speaker by real name?",
+    "answer": "No. It often assigns labels such as Speaker 1 and Speaker 2. Mapping those labels to people requires additional reliable information.",
+    "title": "Speech input",
+    "scope": "Speech recognition, language identification, diarization, timestamps, accents, noise, domain vocabulary, and transcription-versus-translation errors.",
+    "sources": []
+  },
+  {
+    "id": 66,
+    "explanation": [
+      "Text-to-speech generates spoken audio from text. Prosody includes rhythm, stress, and intonation. Dubbing also requires translation choices, timing, and often synchronization with video.",
+      "Voice likeness raises consent and provenance questions. Evaluate intelligibility and meaning, not only how natural the voice sounds."
+    ],
+    "mechanism": [
+      "Text-to-speech turns text into audio. Prosody covers rhythm, emphasis, pitch, and pacing; pronunciation controls help with names and abbreviations. Voice conditioning guides vocal characteristics. Voice conversion changes aspects of an existing recording's voice while attempting to retain other content.",
+      "Dubbing combines transcription, translation, performance, timing, and mixing. Synchronization must fit speech into available time without losing meaning. Music generation has its own structure and licensing considerations. Consent and provenance matter when imitating identifiable voices or distributing synthetic media."
+    ],
+    "example": [
+      "A short tutorial is dubbed into another language.",
+      "The translated sentence is longer, so speaking it faster makes it unnatural and overlaps the next scene.",
+      "The team rewrites for equivalent meaning, checks pronunciation, adjusts timing, and preserves background sounds separately."
+    ],
+    "use": "Use speech generation for accessible narration, localization, and interactive responses, with listening-based quality checks.",
+    "caution": "A convincing voice match does not establish consent, and a fluent dub does not prove the translation is accurate.",
+    "question": "What should you evaluate besides whether a synthetic voice sounds natural?",
+    "answer": "Pronunciation, meaning, pacing, timing, speaker consistency, audio artifacts, and whether the use is authorized and clearly represented.",
+    "title": "Speech output and media",
+    "scope": "Text-to-speech, voice conditioning, prosody, voice conversion, dubbing, synchronization, music generation, provenance, and consent.",
+    "sources": []
+  },
+  {
+    "id": 67,
+    "explanation": [
+      "A real-time assistant must decide when you started, paused, interrupted, or finished speaking. Voice activity detection and turn-taking influence whether it feels responsive.",
+      "A pipeline may transcribe, reason, then synthesize; another model may process audio more directly. Measure the full interaction, including interruptions and recovery from mishearing."
+    ],
+    "mechanism": [
+      "A real-time assistant must manage the conversation clock as well as content. Voice activity detection estimates when speech is present. Turn-taking decides when to respond; interruption handling stops or adapts playback when the user speaks. Streaming reduces the delay before useful output begins.",
+      "A pipeline may combine speech recognition, a text model, and speech synthesis. Native audio models process or generate audio more directly, with different tradeoffs. Total latency includes capture, detection, network, model processing, and playback. Mishearing needs explicit recovery rather than continuing confidently."
+    ],
+    "example": [
+      "You ask a voice assistant to set a timer, then interrupt: ‘Actually, make it ten minutes.’",
+      "The system stops speaking, updates the request, and confirms the final timer state.",
+      "If it ignores the interruption, it may execute the obsolete five-minute request while verbally discussing ten minutes."
+    ],
+    "use": "Design for interruptions, noisy rooms, and delayed networks. Verify action state after corrections, not just the spoken response.",
+    "caution": "Fast speech synthesis cannot compensate for a long pause caused by poor turn detection or slow tool calls.",
+    "question": "Why should pending actions be considered when a user interrupts?",
+    "answer": "The correction may invalidate an action already queued or partially executed. The system must reconcile actual state before confirming the revised result.",
+    "title": "Real-time assistants",
+    "scope": "Streaming audio, voice activity detection, turn-taking, interruptions, latency budgets, speech pipelines versus native audio models, and recovery from mishearing.",
+    "sources": []
+  },
+  {
+    "id": 68,
+    "explanation": [
+      "Robotics connects perception, planning, and control to physical consequences. Imitation learning learns from demonstrations; reinforcement learning uses rewards from interaction. Simulators make some experiments cheaper.",
+      "The real world differs from simulation. Sensors, friction, delays, and unexpected people matter. On-device AI and federated learning address different deployment and data-distribution concerns."
+    ],
+    "mechanism": [
+      "Embodied systems connect perception, planning, and control to a physical environment. Perception estimates state; planning chooses goals or paths; control issues timely actuator commands. Imitation learning uses demonstrations, while reinforcement learning optimizes behavior using rewards from interaction.",
+      "Simulators enable many practice trials, but sim-to-real transfer is difficult when friction, lighting, sensors, or timing differ. Edge AI runs near the data source; federated learning coordinates learning across devices without necessarily centralizing raw data. Neither removes all privacy or safety concerns."
+    ],
+    "example": [
+      "A robot learns to grasp boxes in simulation.",
+      "Real boxes bend and a camera is slightly misaligned, so the simulated strategy drops objects.",
+      "The team tests conservatively, improves sensing and environment modeling, and uses physical limits and stop mechanisms independent of model output."
+    ],
+    "use": "Use these concepts to understand why robotics needs reliable feedback and engineering beyond a language model's proposed plan.",
+    "caution": "A language model's high-level instruction is not a safe low-level motor command.",
+    "question": "Does federated learning guarantee that no private information can leak?",
+    "answer": "No. Updates and metadata can still reveal information. Privacy depends on the full protocol and safeguards, not merely keeping raw data on devices.",
+    "title": "Embodied and decision systems",
+    "scope": "Reinforcement learning beyond LLMs, imitation learning, perception/planning/control, robotics, simulators, sim-to-real transfer, edge/on-device AI, federated learning, and physical constraints.",
+    "sources": []
+  }
+]

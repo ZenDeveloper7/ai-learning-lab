@@ -1,0 +1,114 @@
+[
+  {
+    "id": 29,
+    "explanation": [
+      "Numerical precision is how finely a value is represented. Quantization stores values using a more compact representation, reducing weight memory and sometimes accelerating supported computation.",
+      "Storage precision and compute precision can differ. A four-bit model is not necessarily performing every operation in four bits. Lower precision may damage some capabilities more than others."
+    ],
+    "mechanism": [
+      "Precision describes how numerical values are represented. FP32 uses more bits than FP16 or BF16; FP16 and BF16 both use 16 bits but allocate range and precision differently. INT8 and 4-bit schemes represent values more compactly, often using scales and other metadata.",
+      "Storage precision and compute precision can differ. A runtime may store compressed weights and convert blocks into a higher precision for operations. Mixed precision uses different representations in different parts of the workload. Quality and speed effects depend on the model and supported kernels."
+    ],
+    "example": [
+      "A laptop cannot load a full-precision model comfortably.",
+      "A supported quantized build reduces the weight footprint, leaving room for the cache. The user retests extraction accuracy and latency rather than assuming no behavior changed.",
+      "A small memory reduction with a large quality loss would be a poor trade for that task."
+    ],
+    "use": "Use precision choices to fit resource constraints, guided by measured quality and hardware support.",
+    "caution": "A 4-bit label does not mean every value, activation, cache entry, or operation in the system uses four bits.",
+    "question": "Why can a quantized model occupy more than the naive weight-bit estimate?",
+    "answer": "Scales, metadata, unquantized layers, runtime allocations, and caches add overhead beyond the packed weight values.",
+    "title": "Precision without the maths",
+    "scope": "FP32, FP16, BF16, INT8, 4-bit representations, storage versus compute precision, mixed precision, and quality/resource tradeoffs.",
+    "sources": [
+      {
+        "label": "Transformers: bitsandbytes quantization",
+        "url": "https://huggingface.co/docs/transformers/quantization/bitsandbytes"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "explanation": [
+      "Post-training quantization transforms an already trained model. Quantization-aware training incorporates the effects of lower precision during training. Calibration examples can help select representations that preserve important behavior.",
+      "Weights, activations, and the KV cache can be quantized separately. The choice affects different memory costs. Always evaluate the configuration you will actually deploy."
+    ],
+    "mechanism": [
+      "Post-training quantization converts an already trained model. Quantization-aware training includes simulated or actual quantization effects during training so parameters can adapt. Methods may compress weights, activations, or the KV cache; these affect different parts of memory and execution.",
+      "Calibration uses representative inputs to estimate useful ranges or sensitivities. Outliers are unusually large values that can make a single shared range waste precision. Per-channel or grouped schemes assign finer-grained scales, trading metadata and implementation complexity for fidelity."
+    ],
+    "example": [
+      "A team calibrates a document model only on short English prose.",
+      "It then evaluates long code snippets and another language, where errors increase. The calibration examples did not represent deployment well.",
+      "The team improves coverage and compares quality before accepting the quantized release."
+    ],
+    "use": "Pick methods supported by your runtime, then test the actual task distribution. Distinguish weight-memory savings from cache-memory savings.",
+    "caution": "Quantization is a family of methods, not one uniform conversion with a guaranteed quality cost.",
+    "question": "Would quantizing only the KV cache shrink the downloaded weight files?",
+    "answer": "No. It targets request-time cache storage. Weight-file compression requires a weight quantization or other model-storage change.",
+    "title": "Quantization approaches",
+    "scope": "Post-training quantization versus quantization-aware training; weight, activation, and KV-cache quantization; calibration data; outliers; per-channel/group choices at a conceptual level.",
+    "sources": [
+      {
+        "label": "Transformers: bitsandbytes quantization",
+        "url": "https://huggingface.co/docs/transformers/quantization/bitsandbytes"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "explanation": [
+      "Labels such as a GGUF quantization variant, GPTQ, AWQ, or NF4 describe different representation and tooling choices. They are not interchangeable downloads for every engine.",
+      "Two four-bit artifacts can have different quality, memory overhead, and hardware kernels. Read the runtime's compatibility documentation and benchmark the actual combination."
+    ],
+    "mechanism": [
+      "A quantization label describes an artifact or method within an ecosystem. GGUF labels can indicate bit families and mixed treatment of tensors. GPTQ and AWQ are weight-quantization approaches with their own conversion and runtime requirements. Bitsandbytes supports low-bit loading and training workflows; NF4 is a particular four-bit representation.",
+      "Equal nominal bit counts do not imply identical effective file size, calibration, numerical error, or speed. Read the artifact's description and compatible loader rather than treating every ‘4-bit’ file as interchangeable."
+    ],
+    "example": [
+      "You download a four-bit checkpoint intended for one serving engine.",
+      "A different local runtime rejects it even though that runtime also advertises four-bit support. The packaging, architecture, or kernels are incompatible.",
+      "You select an artifact explicitly supported by the runtime and repeat the baseline tests."
+    ],
+    "use": "Record the complete filename, quantization method, base revision, and runtime version when sharing results or troubleshooting.",
+    "caution": "Do not infer a universal quality ranking from a filename suffix. Compare task results for the actual artifacts.",
+    "question": "Can you rename a quantized file's extension to convert it?",
+    "answer": "No. Conversion changes tensor representation and metadata. Renaming changes only the label on the file, not its contents.",
+    "title": "Reading quantized model labels",
+    "scope": "GGUF quantization labels, GPTQ, AWQ, bitsandbytes/NF4 as ecosystem examples; runtime and hardware compatibility; why equal bit counts do not imply equal quality or speed.",
+    "sources": [
+      {
+        "label": "Transformers: bitsandbytes quantization",
+        "url": "https://huggingface.co/docs/transformers/quantization/bitsandbytes"
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "explanation": [
+      "Distillation trains a student model using guidance from another model. Pruning removes selected parameters or structures. Sparsity means some values or operations can be omitted. Quantization changes precision.",
+      "These methods can be combined, but compression does not automatically produce acceleration. Hardware and software must exploit the changed representation."
+    ],
+    "mechanism": [
+      "Distillation trains a student to imitate useful behavior from a teacher, using outputs, distributions, or representations. Pruning removes selected parameters or structures. Sparsity means many values or connections are absent or zero, but speedups require implementations that exploit that pattern.",
+      "Architectural changes can reduce repeated work or alter model capacity. A smaller checkpoint can still incur expensive operations, and an unstructured sparse model may run through dense kernels without a speed benefit. Evaluate memory, latency, and task quality separately."
+    ],
+    "example": [
+      "A company distills a large support model into a smaller specialist.",
+      "The student handles common routing cases quickly but struggles with unusual multi-issue tickets. A held-out set reveals the gap.",
+      "The product routes uncertain cases to a stronger model or human instead of assuming imitation preserved every capability."
+    ],
+    "use": "Use compression when a defined task must meet device, latency, or cost constraints. Keep difficult and rare cases in evaluation.",
+    "caution": "A student does not automatically inherit all the teacher's knowledge or reliability, and it can inherit the teacher's mistakes.",
+    "question": "Why might pruning half the weights fail to halve response time?",
+    "answer": "The runtime may still perform dense operations, or memory transfers and other components may dominate. Hardware-aware structure and measurement matter.",
+    "title": "Compression beyond quantization",
+    "scope": "Distillation, pruning, sparsity, and architectural changes; checkpoint size versus runtime memory; why 'smaller' and 'faster' are separate claims.",
+    "sources": [
+      {
+        "label": "Transformers: bitsandbytes quantization",
+        "url": "https://huggingface.co/docs/transformers/quantization/bitsandbytes"
+      }
+    ]
+  }
+]

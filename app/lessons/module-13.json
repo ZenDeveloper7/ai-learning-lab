@@ -1,0 +1,114 @@
+[
+  {
+    "id": 49,
+    "explanation": [
+      "Keyword search is strong when exact terms matter. Semantic search uses embeddings to retrieve related meaning even when words differ. Hybrid search combines signals; a reranker reassesses shortlisted results.",
+      "A vector database stores and searches representations. It does not independently decide whether a source is true, current, or authorized for a particular user."
+    ],
+    "mechanism": [
+      "Keyword search matches terms; BM25 is a common ranking approach that weighs term relevance with document statistics. Embedding search compares learned representations, helping find conceptually similar text even without exact wording. Vector indexes organize those representations for efficient lookup; approximate search trades some recall for speed.",
+      "Metadata filters restrict candidates by attributes such as date, product, or access permission. Hybrid search combines lexical and semantic signals. A reranker examines retrieved candidates more closely against the query, often improving ordering at additional cost."
+    ],
+    "example": [
+      "A customer searches for ‘can't sign in’ in a help center.",
+      "Embedding search finds ‘login troubleshooting,’ while keyword search preserves an exact error code such as E104. A reranker puts the passage matching the full situation first.",
+      "Access filters remove internal-only support notes before evidence reaches the answer model."
+    ],
+    "use": "Use hybrid methods when both concepts and exact identifiers matter. Evaluate retrieval before tuning the final answer prompt.",
+    "caution": "A nearby vector is a similarity signal, not proof that a passage answers the question or is factually correct.",
+    "question": "Why might pure semantic search miss the best result for a part number?",
+    "answer": "Exact identifiers may carry little natural-language meaning. Keyword matching and metadata filters can preserve that precise distinction.",
+    "title": "Search building blocks",
+    "scope": "Embedding models, similarity intuition, keyword/BM25 search, vector indexes/databases, approximate retrieval, hybrid search, metadata filters, and rerankers.",
+    "sources": [
+      {
+        "label": "Retrieval-Augmented Generation paper",
+        "url": "https://arxiv.org/abs/2005.11401"
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "explanation": [
+      "A RAG pipeline parses documents, splits them into chunks, indexes them, retrieves candidates, and supplies selected evidence to generation. Metadata preserves source identity, dates, and access rules.",
+      "Chunking too narrowly can remove context; too broadly can bury relevant details. Citations must point to evidence that actually supports the answer."
+    ],
+    "mechanism": [
+      "RAG means retrieval-augmented generation: fetch relevant evidence and supply it to a generator. Ingestion collects documents; parsing extracts their structure; OCR recognizes text in scanned images. Chunking divides content into retrievable pieces, and overlap can preserve nearby context at the cost of duplication.",
+      "Metadata records source, date, section, and permissions. Indexing makes chunks searchable. Retrieval and optional reranking select evidence, then context assembly supplies it with instructions and source identifiers. Citations must point to passages that actually support the generated claims."
+    ],
+    "example": [
+      "You ask whether a device is covered after water damage.",
+      "The system retrieves the warranty clause and its exclusion paragraph, includes both with source links, and answers using those limits.",
+      "If the exclusion is split into a missing chunk, a plausible answer could incorrectly promise coverage."
+    ],
+    "use": "Use RAG for answers grounded in an external, updateable collection. Preserve document structure and permissions throughout the pipeline.",
+    "caution": "RAG reduces some information gaps but does not eliminate hallucinations or guarantee that citations support every sentence.",
+    "question": "Where would you look first if the right policy exists but the answer uses an unrelated one?",
+    "answer": "Inspect retrieved candidates and filters before changing the generator. The relevant evidence may never have reached it.",
+    "title": "Building RAG",
+    "scope": "Ingestion, parsing, OCR, chunking, overlap, metadata, indexing, retrieval, reranking, context assembly, citations, and source permissions.",
+    "sources": [
+      {
+        "label": "Retrieval-Augmented Generation paper",
+        "url": "https://arxiv.org/abs/2005.11401"
+      }
+    ]
+  },
+  {
+    "id": 51,
+    "explanation": [
+      "Query rewriting can make a question easier to retrieve for. Multi-hop tasks need several pieces of evidence. Structured data may be better queried through a database than converted into prose chunks.",
+      "Knowledge graphs represent explicit relationships. Graph-based retrieval is useful for some connected questions, but adds maintenance and complexity. Compare it with simpler retrieval first."
+    ],
+    "mechanism": [
+      "Query rewriting turns a vague request into a more searchable form; decomposition splits a multi-part question. Multi-hop retrieval gathers evidence in stages when one result identifies what to search next. SQL queries structured tables, while knowledge graphs represent explicit entities and relationships. GraphRAG uses graph-oriented retrieval or summaries, with implementation-dependent details.",
+      "Multimodal retrieval searches across media representations. Long context can hold a small relevant collection directly; retrieval selects from larger or changing collections; fine-tuning changes behavior. Choose based on the information need rather than treating these methods as interchangeable."
+    ],
+    "example": [
+      "A user asks which supplier's delayed parts affected last month's unfinished orders.",
+      "The system queries order and delivery tables, links supplier IDs, and retrieves relevant exception notes.",
+      "A single similarity search over prose would not reliably perform the required joins or date filtering."
+    ],
+    "use": "Add retrieval complexity only when a simple baseline misses identifiable needs. Validate rewritten queries and generated database operations.",
+    "caution": "A knowledge graph does not automatically make every relationship correct; extraction and source quality still matter.",
+    "question": "Would fine-tuning be the natural way to answer today's stock-count question?",
+    "answer": "Usually no. Query the current inventory system with appropriate permissions; weights are not a reliable live inventory database.",
+    "title": "Advanced retrieval",
+    "scope": "Query rewriting, decomposition, multi-hop retrieval, structured databases/SQL, knowledge graphs/GraphRAG, multimodal retrieval, and choosing among RAG, long context, and fine-tuning.",
+    "sources": [
+      {
+        "label": "Retrieval-Augmented Generation paper",
+        "url": "https://arxiv.org/abs/2005.11401"
+      }
+    ]
+  },
+  {
+    "id": 52,
+    "explanation": [
+      "Evaluate retrieval and generation separately. Did the relevant source appear in the candidates? Did the answer use it correctly? These are different tests.",
+      "Updates and deletions must reach the index. A source can be accurate historically but wrong for today's policy. Apply permissions before exposing retrieved content."
+    ],
+    "mechanism": [
+      "Retrieval recall asks whether needed evidence was found; precision asks how much retrieved material is relevant. Generation quality asks what the model did with the evidence. Evaluate these separately so one stage's error is not blamed on another.",
+      "Freshness requires propagating updates and deletions into indexes and caches. Contradictory sources need dates, authority, and context rather than arbitrary averaging. Permission filtering must apply for the current user, and citations should be checked against the exact passages used."
+    ],
+    "example": [
+      "A company changes its return window from 30 days to 14 days.",
+      "The old policy remains in a vector index, and a cached answer still cites it.",
+      "The team updates the source, reindexes affected chunks, invalidates relevant caches, and tests questions that previously returned the old rule."
+    ],
+    "use": "Maintain a retrieval test set containing expected evidence, conflicting versions, missing answers, and unauthorized documents.",
+    "caution": "A current source URL can still be paired with stale indexed text. Track the version or retrieval time of the actual content.",
+    "question": "If retrieval contains the correct exception but the answer omits it, which stage needs attention?",
+    "answer": "Generation or context assembly. Confirm the exception was actually passed to the model, then evaluate how instructions and model behavior handle it.",
+    "title": "Retrieval evaluation and freshness",
+    "scope": "Recall/precision conceptually, retrieval versus generation errors, stale documents, contradictions, updates/deletions, provenance, permission filtering, and citation verification.",
+    "sources": [
+      {
+        "label": "Retrieval-Augmented Generation paper",
+        "url": "https://arxiv.org/abs/2005.11401"
+      }
+    ]
+  }
+]

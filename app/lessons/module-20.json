@@ -1,0 +1,94 @@
+[
+  {
+    "id": 77,
+    "explanation": [
+      "Start with the user's job, not the model. Decide where AI helps, where deterministic logic is sufficient, and where a person should review an outcome.",
+      "A useful interface communicates uncertainty and offers recovery. A system that occasionally refuses or falls back can be more useful than one that confidently invents a result."
+    ],
+    "mechanism": [
+      "Start with a user need and a bounded task: what input arrives, what output helps, and what happens if it is wrong? Decide which steps can be deterministic and which benefit from learned interpretation or generation. Human review should have a clear purpose and enough evidence to be effective.",
+      "Graceful fallback gives users a useful next step when the model lacks evidence or a tool fails. Communicate uncertainty where it affects decisions. Accessibility includes readable structure, keyboard use, and alternatives to modalities users cannot access. AI adds value only when the whole workflow improves."
+    ],
+    "example": [
+      "A shop wants faster support.",
+      "The first useful feature drafts answers with cited policy passages for agents to review, rather than immediately automating every refund.",
+      "The team measures handling time, correction rate, and customer outcomes to decide whether more autonomy is justified."
+    ],
+    "use": "Build a simple end-to-end baseline and observe actual users. Expand scope only when evaluation supports it.",
+    "caution": "Human-in-the-loop is not effective if reviewers lack time, context, or authority to catch mistakes.",
+    "question": "What should happen when the assistant cannot determine eligibility from available records?",
+    "answer": "Explain the missing information and route to an appropriate lookup or reviewer, preserving the user's progress instead of inventing a decision.",
+    "title": "Product and system design",
+    "scope": "User need, task boundaries, human review, graceful fallback, uncertainty communication, accessibility, deterministic components, and deciding when AI adds value.",
+    "sources": []
+  },
+  {
+    "id": 78,
+    "explanation": [
+      "Production changes include new models, prompts, data, and tools. Version them so a regression can be traced. Test before release and retain a rollback path.",
+      "Monitor task success as well as uptime. A service can be technically available while producing worse answers after a data or model change."
+    ],
+    "mechanism": [
+      "Version prompts, models, data, and configuration so a deployed behavior can be traced to its inputs. Monitoring tracks availability, latency, failures, quality signals, and unusual usage. Drift means the environment or data distribution changes relative to earlier expectations.",
+      "Regression gates prevent known quality losses from shipping. A canary release exposes a change to a small portion of traffic before wider rollout. Rollback restores a known-good version. Feedback loops need review because raw user ratings can be noisy or manipulated. Incident handling covers both infrastructure and answer-quality failures."
+    ],
+    "example": [
+      "A model update improves summaries but starts omitting exceptions in policy answers.",
+      "Canary monitoring and a regression set detect the problem before full rollout.",
+      "The team restores the earlier model configuration, investigates the change, and retests the corrected candidate."
+    ],
+    "use": "Treat prompts and retrieval changes as deployable behavior changes, not harmless text edits. Keep a practical recovery path.",
+    "caution": "A healthy HTTP endpoint does not prove the assistant is producing useful or correct answers.",
+    "question": "Why version the retrieval index alongside the model?",
+    "answer": "The evidence supplied to the model can change behavior substantially. Reproducing an answer requires knowing which source collection and versions were available.",
+    "title": "Operating in production",
+    "scope": "Versioned prompts/models/data, deployment, monitoring, drift, observability, feedback loops, regression gates, canaries, rollback, incident handling, and service reliability.",
+    "sources": []
+  },
+  {
+    "id": 79,
+    "explanation": [
+      "Total cost includes inference, infrastructure, storage, engineering, monitoring, and failures. A cheap request that needs repeated correction may cost more per successful task.",
+      "Local, cloud, and hybrid approaches distribute these costs differently. Compare realistic workloads, including peak usage and maintenance, before choosing."
+    ],
+    "mechanism": [
+      "Local deployment trades hosted-service dependence for hardware, energy, maintenance, and capacity planning. Cloud services simplify some operations but introduce provider limits and data-flow considerations. Hybrid systems split tasks across environments. Compare total ownership cost over the actual workload.",
+      "Costs can include input and output processing, tools, storage, retrieval, cache misses, retries, and human review. GPU utilization matters: an expensive device sitting idle can cost more per useful task than a shared service. Routing and batching can improve efficiency if quality and latency remain acceptable."
+    ],
+    "example": [
+      "A small team compares a dedicated GPU with a hosted endpoint.",
+      "Its traffic is sporadic, so the GPU would be idle most of the day. A larger team with steady batch work may reach a different conclusion.",
+      "Both compare cost per successfully completed task, including failed attempts and operating effort."
+    ],
+    "use": "Use measured traffic and task success rates to estimate costs. Re-evaluate when usage, pricing, or model requirements change.",
+    "caution": "The cheapest token price can produce a more expensive workflow if it needs many retries or more human correction.",
+    "question": "Why might a smaller model plus selective escalation be economical?",
+    "answer": "Common easy tasks can be handled cheaply, while difficult cases use stronger resources. The routing decision and fallback quality must themselves be evaluated.",
+    "title": "Economics and deployment choices",
+    "scope": "Local/cloud/hybrid tradeoffs; input/output/tool/cache costs; GPU utilization; quotas; batching; routing; total ownership cost; vendor dependency; and cost per successful outcome.",
+    "sources": []
+  },
+  {
+    "id": 80,
+    "explanation": [
+      "Integration means explaining the whole path from user input to verified outcome. Defend each component against a simpler alternative. Document what you measured and what remains uncertain.",
+      "New terminology becomes manageable when you ask where it fits: data, model, adaptation, inference, context, tools, evaluation, or deployment. Extend the map with evidence rather than chasing every release."
+    ],
+    "mechanism": [
+      "Bring the lifecycle together: define a problem, select a suitable model role, prepare trustworthy data or evidence, assemble context, run inference, integrate tools, evaluate outcomes, and operate the system. Training is one possible intervention within that lifecycle, not a mandatory step for every project.",
+      "Build capstones that make choices visible. Explain why you selected retrieval rather than memorization, adapters rather than full training, or a workflow rather than an agent. Keep a backlog of gaps revealed by evidence. New terminology matters when it explains a useful mechanism or tradeoff, not simply because it is fashionable."
+    ],
+    "example": [
+      "For your learning website, static lesson content supplies the core teaching.",
+      "An optional tutor receives the current lesson and a question, while progress is stored by the application. Evaluation checks lesson clarity separately from tutor accuracy and deployment reliability.",
+      "You can explain which component needs changing when content is shallow, memory is missing, or the tutor is unavailable."
+    ],
+    "use": "Finish three practical demonstrations: a measured local model run, a source-grounded question-answering workflow, and a bounded tool-using workflow with verified results.",
+    "caution": "Completing this course gives a broad conceptual foundation, not mastery of every AI specialty or proof that an untested system is reliable.",
+    "question": "How would you decide what to learn next?",
+    "answer": "Identify a concrete task or recurring failure, name the missing concept or capability, and choose a focused experiment with a way to judge success.",
+    "title": "Integration and continuing learning",
+    "scope": "Finish the capstones, explain the entire lifecycle, defend choices against alternatives, document limits, and maintain a topic backlog based on evidence rather than every new acronym.",
+    "sources": []
+  }
+]

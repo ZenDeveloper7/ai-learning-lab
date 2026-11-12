@@ -1,0 +1,94 @@
+[
+  {
+    "id": 61,
+    "explanation": [
+      "Vision systems can classify an image, locate objects, segment regions, read text, or answer questions about visual content. These are different tasks with different error patterns.",
+      "Small text, crowded scenes, and spatial relationships can be difficult. Ask the system to separate what is directly visible from what it infers."
+    ],
+    "mechanism": [
+      "Image classification assigns a label to an image. Object detection locates objects with boxes; segmentation assigns regions or pixels to categories or instances. OCR extracts visible text. Visual embeddings support similarity search, and vision-language models connect images with text tasks.",
+      "Resolution, cropping, compression, and page layout affect what information is available. A chart requires interpreting axes, units, legends, and data marks, not merely describing its appearance. Spatial reasoning and exact counting can remain unreliable even when general image descriptions are convincing."
+    ],
+    "example": [
+      "An assistant reads a photograph of an electricity meter.",
+      "Glare obscures one digit. A fluent response fills in a plausible number, but a careful system flags the uncertain digit and asks for a clearer image.",
+      "For billing, the extracted value should be verified rather than accepted because the description sounds confident."
+    ],
+    "use": "Use specialized vision tasks when you need structured locations, text, or categories. Supply sufficient resolution and evaluate on realistic image conditions.",
+    "caution": "A model describing an object does not prove it measured its size, counted every instance, or read small print correctly.",
+    "question": "What should you inspect before trusting a chart summary?",
+    "answer": "The axes, units, scale, legend, time range, and actual data points. A visually rising line may be misleading if the axes or context are misunderstood.",
+    "title": "Understanding visual input",
+    "scope": "Image classification, detection, segmentation, OCR, visual embeddings, vision-language models, spatial reasoning, documents/charts, and resolution limits.",
+    "sources": []
+  },
+  {
+    "id": 62,
+    "explanation": [
+      "Image generators learn patterns that can produce images conditioned on text or other inputs. Diffusion progressively transforms noise; flow-matching methods learn related transformation dynamics. Some systems use autoregressive generation.",
+      "Seeds and sampling settings influence results, but exact reproducibility also depends on software and hardware. Visual appeal does not prove factual accuracy."
+    ],
+    "mechanism": [
+      "Image generators learn relationships between conditioning inputs and visual patterns. Autoregressive systems generate representations sequentially. Diffusion systems learn to reverse a noise-adding process. Flow-based approaches learn transformations between distributions, often expressed through a learned evolution from noise toward data.",
+      "Latent representations compress the space in which generation happens. Conditioning supplies text, images, or other guidance. Guidance strength and sampling steps influence adherence, appearance, and runtime in method-dependent ways. Seeds help repeat a setup, but exact reproducibility also depends on model and execution details."
+    ],
+    "example": [
+      "A designer requests a product photo on a wooden desk.",
+      "The model generates a plausible scene, but the product's printed label is misspelled. Adjusting a seed changes the result without guaranteeing accurate branding.",
+      "The designer evaluates composition and exact details separately, using editing or source assets where precision matters."
+    ],
+    "use": "Use generation for concepts, illustrations, and visual exploration. Specify subject, composition, and constraints, then inspect the actual pixels.",
+    "caution": "A realistic image is not photographic evidence that the depicted event or object existed.",
+    "question": "Why record more than the seed when trying to reproduce an image?",
+    "answer": "The model revision, prompt, dimensions, conditioning, sampler, settings, and runtime can all influence the output.",
+    "title": "Generating images",
+    "scope": "Autoregressive, diffusion, and flow-matching approaches conceptually; latent representations, conditioning, guidance, sampling steps, seeds, and reproducibility.",
+    "sources": []
+  },
+  {
+    "id": 63,
+    "explanation": [
+      "Inpainting edits a region; outpainting extends a canvas; image-to-image uses an input image as a starting condition. Reference conditioning and control signals guide composition or identity.",
+      "An image LoRA adapts a model for certain patterns, such as a style. It is not a guarantee of exact identity preservation. Compare edits against the original intent."
+    ],
+    "mechanism": [
+      "Image-to-image generation starts from an existing image or its representation. Inpainting changes a selected region; outpainting extends beyond the original frame. Reference conditioning guides appearance, while control signals such as edges, pose, or depth constrain structure.",
+      "Image adapters and LoRA can adapt style or concepts, with method-specific training and inference requirements. Consistency means preserving desired identity, geometry, or style across edits; it must be evaluated rather than assumed. Masks and prompts guide changes but may not perfectly preserve surrounding details."
+    ],
+    "example": [
+      "You want to replace the sky in a building photograph.",
+      "An inpainting mask selects the sky, and a reference guides the sunset colors. The result also subtly changes window reflections and roof edges.",
+      "Comparing against the original reveals whether those changes are acceptable for the intended use."
+    ],
+    "use": "Use editing when retaining an existing composition matters. Check unedited regions, text, identity, and geometry after every significant transformation.",
+    "caution": "A visually attractive edit can still be incorrect if it changes a product feature, person's identity, or evidence-bearing detail.",
+    "question": "How would you evaluate a series of generated product images?",
+    "answer": "Check the same dimensions, logo, controls, colors, and material details across views, not only whether each individual image looks polished.",
+    "title": "Editing and adapting images",
+    "scope": "Image-to-image, inpainting, outpainting, reference conditioning, control signals, image adapters/LoRA, identity/style consistency, and evaluation beyond aesthetic appeal.",
+    "sources": []
+  },
+  {
+    "id": 64,
+    "explanation": [
+      "Video adds time. A frame can look good while motion between frames is inconsistent. Understanding systems may sample frames and miss brief events. Generation must maintain identity, geometry, and motion over time.",
+      "A world model attempts to represent aspects of an environment's dynamics. Plausible simulated behavior is not proof of physically valid prediction."
+    ],
+    "mechanism": [
+      "Video understanding can inspect sampled frames, audio, and temporal information; sampling may miss brief events. Video generation must maintain identities, objects, and motion across time, a challenge called temporal consistency. Editing must preserve both frame-level appearance and continuity.",
+      "3D representations include meshes of surfaces, point clouds, and learned scene representations. A world model predicts aspects of an environment's evolution, but visually plausible motion is not proof of correct physics. Camera movement, occlusion, and changing viewpoints complicate interpretation."
+    ],
+    "example": [
+      "A warehouse clip shows a parcel falling for a fraction of a second.",
+      "A summarizer that samples one frame every several seconds misses the drop and describes the scene as normal.",
+      "Increasing temporal coverage or using an event-focused system is necessary before drawing conclusions about what happened."
+    ],
+    "use": "Match temporal sampling and evaluation to the events you care about. For generated video, inspect frame transitions and object persistence.",
+    "caution": "A convincing simulation should not be treated as validated physical prediction without independent checks.",
+    "question": "Why can a video summary be wrong even when every sampled frame is described correctly?",
+    "answer": "The omitted intervals may contain the critical event, and relationships across time may be lost despite accurate individual-frame descriptions.",
+    "title": "Video and 3D",
+    "scope": "Frame sampling versus continuous understanding, temporal consistency, video generation/editing, motion, basic 3D representations, world models, and separating a plausible simulation from validated physical reasoning.",
+    "sources": []
+  }
+]

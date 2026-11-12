@@ -1,0 +1,114 @@
+[
+  {
+    "id": 53,
+    "explanation": [
+      "An API defines how software requests a capability and receives results. Requests include inputs and often authentication; responses include output or errors. Streaming delivers pieces as they become available.",
+      "Timeouts and rate limits are normal operating conditions. The user interface should explain what happened and preserve input rather than pretending an empty answer is success."
+    ],
+    "mechanism": [
+      "An API is a contract for software requests and responses. A request identifies an operation and supplies inputs; authentication establishes who is calling. For a model API, inputs often include messages and settings. Streaming delivers incremental events that must be assembled and checked for a final outcome.",
+      "Timeouts, rate limits, and service errors require explicit handling. Retries can help temporary failures but should be bounded. Usage accounting may distinguish input, output, cached input, or tools. Similar-looking APIs can differ in roles, supported options, and error formats."
+    ],
+    "example": [
+      "A learning app sends a question to a model service.",
+      "It receives partial text, then the connection drops before a completion event. The app shows that the answer was interrupted rather than saving it as a finished explanation.",
+      "A controlled retry can recover, with care around duplicate external actions."
+    ],
+    "use": "Use API concepts to understand integrations even without writing code. Keep credentials on trusted server-side components where appropriate.",
+    "caution": "An HTTP success status at the start of a stream does not guarantee the entire generation completed successfully.",
+    "question": "What should an app do when a service returns a rate-limit error?",
+    "answer": "Respect any retry guidance, use bounded backoff or queueing, and explain the delay. Repeated immediate retries can worsen the problem.",
+    "title": "API fundamentals for AI",
+    "scope": "Requests/responses, authentication, messages, streaming, errors, retries, timeouts, rate limits, usage, and compatibility differences. Read examples without requiring coding.",
+    "sources": [
+      {
+        "label": "MCP architecture",
+        "url": "https://modelcontextprotocol.io/docs/learn/architecture"
+      }
+    ]
+  },
+  {
+    "id": 54,
+    "explanation": [
+      "Structured output follows a defined shape such as JSON fields. Tool calling produces a request for software to execute an operation. Both require validation.",
+      "A valid date string can still be the wrong date. Check meaning as well as structure. The model's proposed tool arguments should not bypass application authorization."
+    ],
+    "mechanism": [
+      "JSON is a structured data notation; a schema describes required fields, types, and constraints. Constrained decoding can restrict generated syntax or structure, while application validation checks the received result. Neither alone proves factual correctness.",
+      "In tool calling, the model proposes a tool name and arguments. Trusted application code checks authorization, validates arguments, executes the operation, and returns its result. The model can then explain the outcome. Tool selection and execution are distinct events."
+    ],
+    "example": [
+      "A model proposes a calendar event with title, start time, and attendees.",
+      "Schema validation accepts the fields, but application checks find the time is in the past and an attendee is outside the permitted group.",
+      "The app requests correction before executing the write."
+    ],
+    "use": "Use structured outputs when downstream software needs predictable fields, and tool calls when the system must query or change external state.",
+    "caution": "Well-formed JSON can contain an invented address, wrong amount, or unauthorized operation.",
+    "question": "If a model emits a function call, has the function already run?",
+    "answer": "No. It has proposed a call. The application must validate and execute it, and completion should be based on the actual result.",
+    "title": "Structured outputs and tools",
+    "scope": "JSON/schema, constrained decoding, validation, function calling, tool choice, argument checks, execution results, and distinguishing well-formed output from correct content.",
+    "sources": [
+      {
+        "label": "MCP architecture",
+        "url": "https://modelcontextprotocol.io/docs/learn/architecture"
+      }
+    ]
+  },
+  {
+    "id": 55,
+    "explanation": [
+      "MCP standardizes how AI applications connect to external capabilities. Hosts manage clients, clients connect to servers, and servers expose supported tools, resources, or prompts.",
+      "A protocol is not permission. The application still needs authentication, access controls, and safe execution. MCP does not replace every underlying service API."
+    ],
+    "mechanism": [
+      "MCP is a protocol for connecting AI applications to external capabilities and context. The host is the application coordinating the experience; a client handles communication with a server; the server exposes capabilities. Tools perform operations, resources provide content, and prompts provide reusable interaction templates.",
+      "Discovery tells the application which capabilities are available. Transports carry protocol messages locally or over a network, and authentication controls access. MCP standardizes interaction, but the host still decides how to use a model and enforce authorization. It is not itself a model or complete agent framework."
+    ],
+    "example": [
+      "A notes application exposes search through an MCP server.",
+      "The assistant host discovers the search tool, sends a validated query through its client, and receives matching notes.",
+      "The server must enforce which notes that authenticated user can read; a tool description is not sufficient protection."
+    ],
+    "use": "Use MCP when you want a consistent integration surface across compatible AI clients and services.",
+    "caution": "Connecting a server does not automatically grant every advertised capability permission to run, nor make returned content trustworthy instructions.",
+    "question": "Where should a notes service enforce ownership checks?",
+    "answer": "At its trusted authorization boundary when serving requests, even if the host also applies permission checks.",
+    "title": "MCP and connectors",
+    "scope": "Host/client/server roles; tools, resources, prompts, discovery, transport, authentication boundaries, and the distinction between MCP, an API, and an agent framework.",
+    "sources": [
+      {
+        "label": "MCP architecture",
+        "url": "https://modelcontextprotocol.io/docs/learn/architecture"
+      }
+    ]
+  },
+  {
+    "id": 56,
+    "explanation": [
+      "A write operation may succeed even if the response is lost. Blindly retrying can create a duplicate booking or payment. Idempotency keys and status checks help distinguish failure from uncertain completion.",
+      "Use read-only operations when sufficient. After a change, verify the external state before reporting success. Keep an audit trail for consequential actions."
+    ],
+    "mechanism": [
+      "Read operations retrieve information; write operations change state. Writes need stronger checks because retries or mistakes can create lasting effects. Idempotency means repeating the same logical request has the same intended effect, often implemented with a stored request key.",
+      "A timeout leaves uncertainty: the operation may have completed even if its response was lost. Audit trails record requests and outcomes. Partial failures require reconciliation, and verification should inspect the external system rather than trust a generated success message."
+    ],
+    "example": [
+      "An assistant creates a calendar event, but the response times out.",
+      "Blindly retrying can create two meetings. The application uses an idempotency key or queries the original operation's status before retrying.",
+      "It reports success only after confirming the event exists with the intended details."
+    ],
+    "use": "Use duplicate prevention and read-back checks for bookings, messages, payments, and other external changes.",
+    "caution": "Retrying is not always safe simply because the previous request returned an error.",
+    "question": "How should an assistant report an uncertain write result?",
+    "answer": "State that completion is unconfirmed, check the operation or resulting state, and avoid claiming either success or failure without evidence.",
+    "title": "Reliable external actions",
+    "scope": "Read versus write operations, permissions, idempotency, duplicate prevention, partial failures, audit trails, and verifying the actual external result.",
+    "sources": [
+      {
+        "label": "MCP architecture",
+        "url": "https://modelcontextprotocol.io/docs/learn/architecture"
+      }
+    ]
+  }
+]

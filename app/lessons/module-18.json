@@ -1,0 +1,114 @@
+[
+  {
+    "id": 69,
+    "explanation": [
+      "An evaluation starts with a task and a definition of success. Collect representative cases, establish a baseline, and keep some examples untouched while improving the system.",
+      "A model judge can help review outputs, but may share biases with the model being evaluated. Human review and deterministic checks remain useful."
+    ],
+    "mechanism": [
+      "An evaluation starts with the task and definition of success. A rubric breaks quality into observable criteria; a representative dataset includes common, difficult, and missing-information cases. A baseline shows whether the new system improves on a simpler alternative.",
+      "Held-out examples reduce tuning bias. Blind review hides system identity to reduce preference effects. Regression tests detect lost capabilities after changes. Human review can assess nuance; model judges can scale review but may favor particular wording or miss factual errors. Validate judges against independent decisions."
+    ],
+    "example": [
+      "You evaluate a course tutor on beginner questions.",
+      "The rubric checks correctness, understandable vocabulary, realistic examples, and whether it admits missing information. Reviewers see answers without model names.",
+      "A verbose model scores lower when it invents facts, even if its explanations sound polished."
+    ],
+    "use": "Create the evaluation before optimizing prompts or selecting a model. Include failure cases that matter to actual users.",
+    "caution": "Testing only questions used during development measures familiarity more than generalization.",
+    "question": "Why include questions with no answer in the supplied documents?",
+    "answer": "To test abstention and evidence boundaries. A system that always answers can appear helpful while inventing unsupported information.",
+    "title": "Designing evaluations",
+    "scope": "Task definitions, rubrics, representative datasets, baseline comparisons, blind review, held-out cases, regressions, human evaluation, and model-as-judge limitations.",
+    "sources": [
+      {
+        "label": "scikit-learn: model selection and evaluation",
+        "url": "https://scikit-learn.org/stable/model_selection.html"
+      }
+    ]
+  },
+  {
+    "id": 70,
+    "explanation": [
+      "Accuracy counts correct predictions overall. Precision asks how many positive predictions were right; recall asks how many real positives were found. The right balance depends on consequences.",
+      "For serving, averages can hide slow outliers. Latency percentiles and cost per successful task can tell you more than raw token speed or cost per request."
+    ],
+    "mechanism": [
+      "Accuracy counts overall correct decisions. Precision asks how many flagged cases are truly positive; recall asks how many true positives were found. F1 combines precision and recall into one summary, which can hide the tradeoff. Ranking metrics evaluate ordering rather than only labels.",
+      "Calibration compares confidence with observed correctness. Perplexity measures predictive fit to token sequences, not broad usefulness. Latency percentiles reveal slow tails: a good average can hide long waits. Cost per successful task includes failures and retries, not just the price of one call."
+    ],
+    "example": [
+      "Of 100 tickets, 10 are urgent. A classifier flags 8, of which 6 are truly urgent.",
+      "Its precision is 6 out of 8, while recall is 6 out of 10. Four urgent cases were missed, and two ordinary tickets were escalated.",
+      "Whether that tradeoff is acceptable depends on the cost of missed urgency versus extra review."
+    ],
+    "use": "Choose metrics from the decision's consequences. Report sample sizes, relevant subgroups, and variability rather than a single flattering score.",
+    "caution": "A classifier that labels all 100 tickets non-urgent is 90% accurate here but finds none of the urgent cases.",
+    "question": "Why might p95 response latency matter more than the mean for a chat product?",
+    "answer": "It exposes delays experienced by slower requests that an average can conceal, helping assess whether users frequently encounter unacceptable waits.",
+    "title": "Reading metrics",
+    "scope": "Accuracy, precision/recall, F1, ranking quality, calibration, perplexity, latency percentiles, cost per successful task, and uncertainty—all interpreted through examples, not formulas.",
+    "sources": [
+      {
+        "label": "scikit-learn: model selection and evaluation",
+        "url": "https://scikit-learn.org/stable/model_selection.html"
+      }
+    ]
+  },
+  {
+    "id": 71,
+    "explanation": [
+      "Trace a failure through the pipeline: source data, retrieval, prompt assembly, model, tool execution, and interface. Locate the first incorrect step before changing the system.",
+      "An ablation removes or changes one component to test its contribution. Changing many things at once can improve results while leaving you unsure why."
+    ],
+    "mechanism": [
+      "An AI application is a pipeline, so failures can originate in data, retrieval, prompts, the model, tools, or the execution environment. Traces record the sequence of events and relevant inputs/outputs. A failure taxonomy groups recurring problems so fixes target causes rather than symptoms.",
+      "An ablation removes or changes one component to test its contribution. Controlled experiments vary one important factor while keeping others stable. Record revisions and settings; seeds do not fully eliminate nondeterminism. Protect sensitive information in logs while retaining enough evidence to reproduce failures."
+    ],
+    "example": [
+      "A support assistant gives the wrong warranty answer.",
+      "The trace shows the correct document was retrieved but omitted during context truncation. Switching to a larger model would not directly repair that assembly bug.",
+      "The team preserves the relevant exception and adds a regression case for long requests."
+    ],
+    "use": "Follow the evidence from user input to final outcome. Fix the earliest incorrect stage that explains the failure.",
+    "caution": "An attractive answer is not an end-to-end trace, and a model upgrade should not substitute for diagnosing broken tooling.",
+    "question": "How would you test whether reranking improves your system?",
+    "answer": "Compare the same held-out queries with and without reranking, keeping the rest fixed, and measure both retrieved evidence and final answer quality.",
+    "title": "Debugging the whole system",
+    "scope": "Traces, data quality, retrieval, prompt, model, tools, environment, one-variable experiments, ablations, reproducibility, seed limits, and failure taxonomies.",
+    "sources": [
+      {
+        "label": "scikit-learn: model selection and evaluation",
+        "url": "https://scikit-learn.org/stable/model_selection.html"
+      }
+    ]
+  },
+  {
+    "id": 72,
+    "explanation": [
+      "A paper's contribution depends on the problem, baseline, dataset, evaluation, and resource budget. Read limitations and ablations, not just the headline score.",
+      "Contamination occurs when evaluation material leaks into training or tuning. A leaderboard improvement may not transfer to your workload. Seek reproducible evidence."
+    ],
+    "mechanism": [
+      "Start a paper by identifying its question, claimed contribution, and comparison baseline. Inspect datasets, train/test separation, compute budget, and how success is measured. Ablations test which components contribute to results; limitations describe where evidence is weak or applicability narrow.",
+      "Contamination occurs when evaluation content influences training or development. Leaderboard overfitting happens when repeated tuning targets a benchmark rather than broader needs. Reproducibility requires enough artifacts and settings to check results. A proposed explanation may be plausible without being directly demonstrated."
+    ],
+    "example": [
+      "A paper reports a large improvement on one benchmark.",
+      "Its new system also uses more inference attempts and a different evaluation prompt.",
+      "You separate the method's contribution from added compute and test whether the improvement holds on your own representative tasks."
+    ],
+    "use": "Read tables with their experimental conditions. Look for independent replications and failures before generalizing a result.",
+    "caution": "State-of-the-art is always relative to a benchmark, date, comparison set, and evaluation procedure.",
+    "question": "What would an ablation that removes retrieval help establish?",
+    "answer": "Whether retrieval contributed to the measured result under those conditions. It would not by itself prove the same gain for every dataset or deployment.",
+    "title": "Reading papers and benchmarks",
+    "scope": "Research question, baseline, dataset, method, compute, ablations, limitations, benchmark contamination, leaderboard overfitting, reproducibility, and separating evidence from speculation.",
+    "sources": [
+      {
+        "label": "scikit-learn: model selection and evaluation",
+        "url": "https://scikit-learn.org/stable/model_selection.html"
+      }
+    ]
+  }
+]

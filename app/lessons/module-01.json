@@ -1,0 +1,94 @@
+[
+  {
+    "id": 1,
+    "explanation": [
+      "Think of AI as a family of techniques, not one machine. A spam filter recognizes a category; a route planner searches for a path; a language model generates text. Machine learning is the branch that learns patterns from examples rather than having every rule written by hand. Deep learning uses networks of many processing layers. Generative AI creates new content.",
+      "A chat product wraps a model in an interface, storage, tools, and permissions. The model may write a request to search the web; the application performs that search. Changing the model does not automatically change the application's access."
+    ],
+    "mechanism": [
+      "A rule-based system follows explicit instructions, such as rejecting a password shorter than a chosen length. Symbolic reasoning manipulates named facts and rules, such as a route planner exploring possible paths. A learned model instead stores patterns acquired from examples. These approaches can coexist.",
+      "A foundation model is trained broadly enough to be adapted to several tasks. The provider develops or supplies it; the runtime executes it; the product combines it with an interface and services. This separation tells you which part to change when a feature is missing."
+    ],
+    "example": [
+      "An online shop receives ‘Where is my parcel?’",
+      "The language model interprets the request. Application code checks the customer's identity and queries a shipping API. The model explains the returned delivery status.",
+      "Without that API result, a fluent delivery estimate would be a guess. The model alone does not know the current parcel location."
+    ],
+    "use": "Use this distinction when comparing chat products or designing one. Ask separately about model capability, available tools, stored data, and permissions.",
+    "caution": "Generative AI is one part of AI. Not every AI system generates content, and not every chatbot capability comes from its model.",
+    "question": "Which component should enforce whether a customer may view an order?",
+    "answer": "The application or service authorization layer. A model can help interpret the question, but access control must be checked by trusted code.",
+    "title": "AI's family tree",
+    "scope": "AI, rules, symbolic reasoning, machine learning, deep learning, generative AI, foundation models, and the difference between a model, product, provider, and runtime.",
+    "sources": []
+  },
+  {
+    "id": 2,
+    "explanation": [
+      "Supervised learning uses examples paired with target answers, such as emails labeled spam or not spam. Unsupervised learning looks for structure without those labels, such as grouping similar customers. Self-supervised learning creates a training task from the data itself: predicting a hidden word is one example.",
+      "Reinforcement learning improves decisions using rewards from interaction. A game-playing system can learn which moves lead to winning. These approaches can be combined across a model's lifecycle."
+    ],
+    "mechanism": [
+      "A feature is an input used for a prediction; a target is the desired output. A label is an annotation providing that target, such as ‘damaged parcel.’ Supervised training compares predictions with labels. Unsupervised training discovers structure without those target labels.",
+      "Self-supervision derives targets from raw data, reducing manual labeling needs. Reinforcement learning uses a reward signal to improve a policy: a rule for choosing actions. Feedback may be delayed and does not always identify which earlier action helped."
+    ],
+    "example": [
+      "A delivery company trains a delay predictor from past deliveries labeled with their actual arrival times.",
+      "It separately groups routes with similar traffic patterns without naming those groups in advance. A simulated dispatch agent then learns action choices from rewards for timely deliveries.",
+      "These are different learning setups serving the same business."
+    ],
+    "use": "Choose the approach from the data and feedback you have. Labeled examples suit prediction; interaction with meaningful rewards can suit sequential decisions.",
+    "caution": "User feedback is not automatically a training update. A product must deliberately collect, process, and use it in a training procedure.",
+    "question": "Is predicting a hidden word from an unlabeled article supervised by a human?",
+    "answer": "No. The article supplies its own target, making this self-supervision. Humans may still select and filter the training data.",
+    "title": "Ways machines learn",
+    "scope": "Supervised, unsupervised, self-supervised, and reinforcement learning; labels, features, targets, predictions, rewards, and feedback—using concrete examples.",
+    "sources": []
+  },
+  {
+    "id": 3,
+    "explanation": [
+      "Classification chooses a category. Regression predicts a numerical value. Clustering finds groups. Anomaly detection flags unusual cases. Recommendation ranks candidates for a user. Forecasting predicts future observations using past information.",
+      "A simple rule can be better than a model when the rule is stable and exact. Calculating a tax subtotal does not require a language model; interpreting a messy customer request might benefit from one. Start with the task, then choose the technique."
+    ],
+    "mechanism": [
+      "A task specifies the output you need. Classification produces labels, regression numbers, and ranking an ordered list. Search retrieves candidates; planning chooses a sequence of actions under constraints. Computer vision and speech describe input domains rather than a single learning method.",
+      "Forecasting requires respecting time: future information must not leak into past predictions. Anomaly detection means unusual relative to a reference pattern, not necessarily fraudulent or broken."
+    ],
+    "example": [
+      "A grocery app forecasts next week's demand, ranks products for each customer, and flags unusual orders for review.",
+      "The stock count is still updated by ordinary database transactions. Checkout totals use exact arithmetic.",
+      "A text model can explain a stock shortage, but replacing the inventory database with generated text would remove the authoritative record."
+    ],
+    "use": "Write down the required output and acceptable error before choosing AI. Stable calculations and exact rules usually belong in conventional software.",
+    "caution": "An unusual observation is a lead to investigate, not proof of wrongdoing.",
+    "question": "Would grouping shoppers by behavior automatically tell you which group will cancel?",
+    "answer": "No. Clustering discovers groups; predicting cancellation requires an additional target and evaluation against real outcomes.",
+    "title": "AI beyond chat",
+    "scope": "Classification, regression, clustering, recommendations, anomaly detection, forecasting, search, planning, computer vision, speech, robotics, and when conventional software is sufficient.",
+    "sources": []
+  },
+  {
+    "id": 4,
+    "explanation": [
+      "A convincing demonstration shows that something worked for those inputs under those conditions. It does not establish that it works reliably for everyone. Ask which examples were selected, what failed, and what counted as success.",
+      "AGI has no single universally accepted operational definition. Consciousness is a different question from task performance. Keep observed capabilities separate from claims about what a system experiences or could someday do."
+    ],
+    "mechanism": [
+      "Capability asks whether a system can accomplish a task under some conditions. Reliability asks how consistently it succeeds across the conditions users actually encounter. Narrow AI addresses bounded tasks; AGI refers to proposed broad general capability, with disputed definitions. Superintelligence describes capability exceeding humans broadly, not a property established by one benchmark.",
+      "Consciousness concerns experience, whereas task scores measure observable behavior. A persuasive conversation cannot settle the consciousness question. To assess a claim, look for the task definition, inputs, sample size, failures, and independent replication."
+    ],
+    "example": [
+      "A vendor shows five flawless invoice extractions.",
+      "You test invoices with rotated pages, missing fields, unfamiliar suppliers, and mixed currencies. The system succeeds on clean pages but invents values when fields are absent.",
+      "The demo established a useful capability; your test revealed the reliability boundary."
+    ],
+    "use": "Use this checklist for product demos, launch posts, and benchmark announcements. Ask what evidence would change your conclusion.",
+    "caution": "A high score on a selected test does not establish safe autonomous operation in a different environment.",
+    "question": "What additional evidence would you request after a successful coding demo?",
+    "answer": "A representative set of tasks, the number of attempts and human interventions, actual test results, and failures—not just the final successful screen.",
+    "title": "Reading AI claims",
+    "scope": "Capability versus reliability; narrow AI, AGI, and superintelligence; intelligence versus consciousness; evidence versus marketing; what a demo establishes and what it does not.",
+    "sources": []
+  }
+]

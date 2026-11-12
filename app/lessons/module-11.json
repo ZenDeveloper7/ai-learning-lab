@@ -1,0 +1,130 @@
+[
+  {
+    "id": 41,
+    "explanation": [
+      "LoRA keeps the base model frozen and learns a relatively small set of added parameters. These low-rank updates adjust selected parts of the model without updating every original weight.",
+      "Rank controls part of the adapter's capacity; target modules decide where it acts. More rank is not automatically better. Data quality, training settings, and evaluation still matter."
+    ],
+    "mechanism": [
+      "LoRA learns a compact update alongside selected existing weight operations while leaving the base weights frozen. ‘Low rank’ means the update is expressed through a smaller intermediate representation rather than a fully independent change to every weight. The learned update can still affect many output dimensions.",
+      "Target modules determine where adapters are inserted. Rank controls update capacity and parameter cost; alpha scales the contribution under the implementation's convention; dropout can regularize training. Raising these settings is not a substitute for representative data and evaluation."
+    ],
+    "example": [
+      "A support team wants a model to use its preferred response structure.",
+      "It freezes the base and trains LoRA adapters on approved examples, then evaluates unseen complaints and general questions.",
+      "The adapter is small to store, but inference still needs the base model and sufficient runtime memory."
+    ],
+    "use": "Use LoRA when repeated task or style adaptation is valuable and full fine-tuning is too expensive. Keep a baseline to verify that adaptation actually helps.",
+    "caution": "LoRA is not a text prompt pasted into every request; it is a learned parameter update applied within the model.",
+    "question": "What remains unchanged during ordinary LoRA training?",
+    "answer": "The frozen base weights. The selected adapter parameters are updated; other components may be trainable only if explicitly configured.",
+    "title": "Parameter-efficient fine-tuning",
+    "scope": "Frozen base weights, trainable adapters, LoRA's low-rank update intuition, target modules, rank, alpha, dropout, and parameter/memory tradeoffs.",
+    "sources": [
+      {
+        "label": "PEFT: LoRA",
+        "url": "https://huggingface.co/docs/peft/main/conceptual_guides/lora"
+      },
+      {
+        "label": "QLoRA paper",
+        "url": "https://arxiv.org/abs/2305.14314"
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "explanation": [
+      "QLoRA trains adapters while keeping a quantized base model frozen. This reduces the memory needed for the base weights during adaptation. Computation can use higher precision than the stored weights.",
+      "It does not mean all model weights are directly trained in four-bit precision. The trainable adapter, runtime state, and compute buffers still have their own memory requirements."
+    ],
+    "mechanism": [
+      "QLoRA combines a low-bit stored base model with trainable adapters. The base remains frozen; computation uses supported numerical representations, including conversion of compressed values where needed. Gradients guide changes to the adapters rather than rewriting every base weight in four bits.",
+      "The original method includes NF4 storage, compression of quantization constants, and paged optimizers to manage memory pressure. Actual implementations and supported devices vary. Memory savings depend on sequence length, activations, batch size, and optimizer choices as well as compressed weights."
+    ],
+    "example": [
+      "A learner adapts a pretrained model to classify support tickets.",
+      "The base is loaded in a supported four-bit configuration, adapters are inserted, and only configured trainable parameters receive updates.",
+      "After training, the learner tests the adapter with its required base and compares mistakes against the unadapted model."
+    ],
+    "use": "Use this workflow when adapter training is useful but base-weight storage is a major memory constraint. Check the current runtime's hardware and quantization support.",
+    "caution": "QLoRA does not imply that the entire training computation or all optimizer state is four-bit.",
+    "question": "Does a QLoRA adapter alone contain the complete frozen base?",
+    "answer": "No. An adapter export typically stores the learned additions and configuration; deployment must also supply a compatible base unless a complete merged artifact was produced.",
+    "title": "QLoRA",
+    "scope": "Training adapters with a quantized frozen base; storage and compute precision; dequantization during computation; why this is not simply updating all weights in four-bit precision.",
+    "sources": [
+      {
+        "label": "PEFT: LoRA",
+        "url": "https://huggingface.co/docs/peft/main/conceptual_guides/lora"
+      },
+      {
+        "label": "QLoRA paper",
+        "url": "https://arxiv.org/abs/2305.14314"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "explanation": [
+      "An adapter is tied to a compatible base model and configuration. Saving only the adapter does not create a standalone copy of the full model. Record the base revision, tokenizer, template, and settings.",
+      "Some workflows merge the adapter into base weights. Merging or re-quantizing can change deployment behavior, so evaluate the exported artifact rather than assuming equivalence."
+    ],
+    "mechanism": [
+      "An adapter is tied to assumptions about its base architecture, revision, target modules, and tokenizer. Save that identity with the adapter. Loading onto an unrelated checkpoint can fail outright or silently damage behavior.",
+      "Separate adapters allow switching tasks while sharing a base. Merging incorporates an update into compatible base weights, but support and numerical effects depend on the method. Re-quantizing a merged result can introduce additional error. Treat the exported or merged artifact as a new candidate that must pass evaluation."
+    ],
+    "example": [
+      "You train an adapter against one model revision, then a model manager automatically downloads a newer revision.",
+      "The adapter loads but answer quality changes. Comparing recorded base identities reveals the mismatch.",
+      "Pinning the expected revision restores the intended pairing, and the team evaluates any proposed upgrade separately."
+    ],
+    "use": "Version base, adapter, tokenizer, template, and quantization together. Test both loading and representative outputs after export.",
+    "caution": "A successful load is not proof of behavioral compatibility.",
+    "question": "Why compare a merged model with the separate base-plus-adapter setup?",
+    "answer": "To detect conversion, precision, or configuration changes. Deployment convenience should not hide a quality regression introduced by merging or re-quantization.",
+    "title": "The adapter lifecycle",
+    "scope": "Saving/loading adapters, matching exact base revisions, tokenizer compatibility, separate adapters versus merging, re-quantization, switching adapters, and verifying exported results.",
+    "sources": [
+      {
+        "label": "PEFT: LoRA",
+        "url": "https://huggingface.co/docs/peft/main/conceptual_guides/lora"
+      },
+      {
+        "label": "QLoRA paper",
+        "url": "https://arxiv.org/abs/2305.14314"
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "explanation": [
+      "Parameter-efficient adaptation includes several families. Prompt tuning learns continuous prompt representations; prefix methods add learned state; adapter methods introduce trainable components. These are not the same as manually writing a better prompt.",
+      "Full fine-tuning offers broader changes at greater resource cost. Choose by measured task benefit and regressions, not by the newest acronym."
+    ],
+    "mechanism": [
+      "Prompt tuning learns input embeddings rather than writing a natural-language prompt; prefix tuning introduces learned representations into attention-related computation. Other adapter methods alter different internal pathways. DoRA extends low-rank adaptation by separating aspects of weight magnitude and direction.",
+      "Full fine-tuning gives broader update freedom but increases resource cost and potential behavior drift. Multiple adapters can interfere when combined. More rank, data passes, or trainable modules can increase capacity while also increasing overfitting and memory use."
+    ],
+    "example": [
+      "One adapter encourages terse answers and another encourages detailed explanations.",
+      "Combining them produces inconsistent style on the same requests. The team evaluates their interaction instead of assuming two individually useful adapters add cleanly.",
+      "It chooses a single task-specific configuration or explicitly routes between adapters."
+    ],
+    "use": "Compare methods with the same held-out task set and operational budget. Use simpler adaptation if it already meets the requirement.",
+    "caution": "Learned soft prompts are parameters; editing a text instruction is ordinary prompting and involves a different mechanism.",
+    "question": "When might increasing LoRA rank fail to improve results?",
+    "answer": "When data is wrong, the task lacks needed evidence, or the current capacity is already sufficient. More capacity can simply memorize the same flawed examples.",
+    "title": "Alternatives and limits",
+    "scope": "Prompt/prefix tuning, other adapter methods, DoRA as an extension, full fine-tuning tradeoffs, adapter interference, and why more rank or more epochs is not automatically better.",
+    "sources": [
+      {
+        "label": "PEFT: LoRA",
+        "url": "https://huggingface.co/docs/peft/main/conceptual_guides/lora"
+      },
+      {
+        "label": "QLoRA paper",
+        "url": "https://arxiv.org/abs/2305.14314"
+      }
+    ]
+  }
+]

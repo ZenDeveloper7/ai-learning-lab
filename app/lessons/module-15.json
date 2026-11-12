@@ -1,0 +1,94 @@
+[
+  {
+    "id": 57,
+    "explanation": [
+      "A workflow follows predefined paths. An agent can choose actions dynamically toward a goal. Both may use the same model and tools. Autonomy is a design choice.",
+      "An agent needs a stopping rule, budget, and evidence of success. For a predictable task, a fixed workflow can be easier to test and more reliable."
+    ],
+    "mechanism": [
+      "A chatbot primarily responds in conversation. A workflow follows a predetermined sequence. An agent chooses some next actions based on observations, often in a loop: inspect state, decide, act through tools, and inspect the result. Real systems can mix all three patterns.",
+      "Useful agents need a bounded goal, available tools, state, stopping conditions, and budgets for time or calls. Human intervention handles decisions outside the delegated scope or failures the system cannot resolve. Autonomy describes decision freedom, not guaranteed competence."
+    ],
+    "example": [
+      "A research assistant searches for a device specification.",
+      "It opens a manufacturer's page, notices a missing regional detail, searches a regional manual, and compares the evidence before answering.",
+      "A stopping rule ends the task once the required fields are supported, rather than searching indefinitely."
+    ],
+    "use": "Use agents when the next useful step depends on intermediate results. Use a fixed workflow when the sequence is already known and dependable.",
+    "caution": "A long chain of model calls is not necessarily an agent; the key question is who chooses the next action and from what feedback.",
+    "question": "What should happen if an agent repeatedly gets the same unavailable-service error?",
+    "answer": "A bounded retry policy should stop or change strategy, report the blocking condition, and request intervention when needed.",
+    "title": "Agent fundamentals",
+    "scope": "Chatbot versus workflow versus agent; observe/plan/act/inspect loops; decomposition, tool selection, stopping rules, budgets, and human intervention.",
+    "sources": []
+  },
+  {
+    "id": 58,
+    "explanation": [
+      "The harness is the software around the model. It builds context, dispatches tools, records state, handles errors, and decides how execution continues. Permissions and cancellation belong here too.",
+      "A weak harness can turn a good model into an unreliable application. Fixing lost tool results or missing recovery state may matter more than changing models."
+    ],
+    "mechanism": [
+      "The harness is the software around the model that manages the task. It assembles messages, tracks state, dispatches tools, schedules work, handles retries and cancellation, and records results. A state machine describes allowed transitions, such as waiting for a tool before consuming its output.",
+      "Persistence and checkpoints support recovery after interruption. A sandbox limits what execution can access; permission rules restrict which actions are authorized. Logging makes failures inspectable. These responsibilities belong to engineered controls rather than relying solely on model instructions."
+    ],
+    "example": [
+      "A coding model requests a test run.",
+      "The harness executes it in the selected workspace, captures the exit code and output, and supplies that evidence to the next model call.",
+      "If the process crashes, persisted task state lets the system resume without pretending the test passed."
+    ],
+    "use": "Use this concept when comparing coding assistants: the same model can behave very differently under different tool, context, and recovery systems.",
+    "caution": "The harness is not just the visible chat window, and the model's suggestion to perform an action is not the harness's authorization to execute it.",
+    "question": "Which part should terminate a tool that exceeds its time limit?",
+    "answer": "The harness or execution supervisor. A prompt asking the model to be quick cannot enforce a process timeout.",
+    "title": "What a harness does",
+    "scope": "Message assembly, state machine, execution environment, tool dispatch, scheduling, retries, cancellation, persistence, resumability, logging, permissions, and sandboxing.",
+    "sources": []
+  },
+  {
+    "id": 59,
+    "explanation": [
+      "Skills package reusable guidance and sometimes scripts or resources. Subagents divide work and may use isolated contexts. A coordinator combines results.",
+      "Parallelism creates coordination costs: duplicated work, stale assumptions, and conflicting edits. Define ownership, input/output contracts, and completion checks before adding agents."
+    ],
+    "mechanism": [
+      "Skills package reusable instructions and sometimes scripts or resources. Project rules establish local conventions; hooks run at defined lifecycle events. Subagents divide work into bounded tasks, with a coordinator combining results. Shared state and handoffs determine whether collaborators can understand one another's changes.",
+      "Parallel work helps independent tasks but can create conflicting edits or duplicated effort. Specify ownership, inputs, expected outputs, and integration checks. Communication and review consume time, so more agents are not automatically more efficient."
+    ],
+    "example": [
+      "One worker researches retrieval quality while another improves the lesson UI.",
+      "They agree on a data interface before editing separate files. The coordinator validates that the new UI handles every lesson record.",
+      "If both rewrite the same file without coordination, merging becomes harder than doing the task sequentially."
+    ],
+    "use": "Use delegation for separable work with clear acceptance criteria. Keep shared architectural decisions explicit.",
+    "caution": "A skill's instructions are not a security boundary or evidence that its scripts are safe to execute.",
+    "question": "What should a useful subtask handoff include?",
+    "answer": "Its goal, files or artifacts changed, validation performed, unresolved issues, and interface assumptions needed by the integrator.",
+    "title": "Skills and coordination",
+    "scope": "Reusable instructions/scripts, project rules, hooks, subagents, delegation, shared state, handoffs, parallel work, coordinator patterns, conflict resolution, and communication overhead.",
+    "sources": []
+  },
+  {
+    "id": 60,
+    "explanation": [
+      "Coding and browser agents act in environments that change. A command can fail, an element can move, or a page can require a login. The agent must inspect feedback and revise its plan.",
+      "Durable execution saves enough state to recover after interruption. The final message is not proof of completion; verify files, tests, or external results."
+    ],
+    "mechanism": [
+      "Coding agents inspect files, edit code, and run checks. Browser or computer-use agents act through interfaces whose layout and state can change. Research agents collect and compare evidence. Durable jobs save enough state to survive restarts; background execution means work continues outside the current interactive exchange.",
+      "Environment feedback is essential: tool output, page state, tests, and external records reveal whether an action worked. Recovery should resume from verified checkpoints, not merely replay every action. Completion criteria must describe the desired outcome, not the eloquence of the final message."
+    ],
+    "example": [
+      "A browser agent fills a form and clicks Submit.",
+      "The page shows a validation error. A screenshot or structured page inspection reveals that the record was not created.",
+      "The agent corrects the field and checks the confirmation or resulting record before declaring completion."
+    ],
+    "use": "Choose automation based on available interfaces and verify every consequential outcome with the environment's own evidence.",
+    "caution": "Background execution is a product capability, not something a model can create by saying ‘I'll keep working.’",
+    "question": "What is stronger evidence that a coding task is complete than ‘done’?",
+    "answer": "A reviewed change, relevant passing checks, and any required runtime verification, with remaining limitations stated explicitly.",
+    "title": "Agents in practice",
+    "scope": "Coding agents, browser/computer use, research agents, durable jobs, background execution, environment feedback, checkpoint recovery, and verifying completion beyond the final message.",
+    "sources": []
+  }
+]

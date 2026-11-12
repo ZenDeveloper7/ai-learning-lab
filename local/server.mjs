@@ -5,7 +5,8 @@ import {fileURLToPath} from 'node:url';
 import {CodexTutor} from './tutor.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const course=JSON.parse(await fs.readFile(path.join(root,'app/course.json'),'utf8'));
-const learning=JSON.parse(await fs.readFile(path.join(root,'app/learning.json'),'utf8'));
+const lessonModules=await Promise.all(Array.from({length:20},(_,i)=>fs.readFile(path.join(root,'app/lessons',`module-${String(i+1).padStart(2,'0')}.json`),'utf8').then(JSON.parse)));
+const lessonContent=new Map(lessonModules.flat().map(lesson=>[lesson.id,lesson]));
 const tutor=new CodexTutor();
 let inflight=false;
 const port=Number(process.env.AI_LEARNING_PORT||4318),origin=`http://127.0.0.1:${port}`;
@@ -25,7 +26,7 @@ const server=http.createServer(async(req,res)=>{
    if(!mod||!Array.isArray(messages)||!messages.length||messages.length>12||messages.some(m=>!['user','assistant'].includes(m.role)||typeof m.text!=='string'||m.text.length>10000)||messages.at(-1).role!=='user'){json(res,400,{error:'Choose a lesson and enter a valid question.'});return}
    if(inflight||tutor.current){json(res,409,{error:'A response is already running. Please wait.'});return}
    inflight=true;try{await tutor.start()}catch(e){inflight=false;json(res,503,{error:e.message});return}
-   const lesson=mod.lessons.find(l=>l.id===lessonId),context=JSON.stringify({module:mod.title,lesson:lesson.title,scope:lesson.scope,primer:learning.primers[mod.id-1][(lessonId-1)%4],coreIdea:mod.anchor,exercise:mod.lab,checkpoint:mod.checkpoint});
+   const lesson=mod.lessons.find(l=>l.id===lessonId),context=JSON.stringify({module:mod.title,lesson:lesson.title,scope:lesson.scope,content:lessonContent.get(lessonId),coreIdea:mod.anchor,exercise:mod.lab,checkpoint:mod.checkpoint});
    res.writeHead(200,{'Content-Type':'application/x-ndjson','Cache-Control':'no-store','X-Accel-Buffering':'no'});res.flushHeaders();const ac=new AbortController();res.on('close',()=>ac.abort());
    try{await tutor.answer({context,messages,signal:ac.signal,emit:event=>{if(!res.destroyed)res.write(JSON.stringify(event)+'\n')}});if(!res.destroyed)res.write(JSON.stringify({done:true})+'\n')}catch(e){if(!res.destroyed)res.write(JSON.stringify({error:e.message})+'\n')}finally{inflight=false;res.end()}return;
   }

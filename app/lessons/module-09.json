@@ -1,0 +1,114 @@
+[
+  {
+    "id": 33,
+    "explanation": [
+      "Prefill processes the prompt and prepares state for generation. Decode generates subsequent tokens. Time to first token captures how long the user waits before output begins; output speed describes the later stream.",
+      "A long prompt may delay the first token even when generation is fast. Report both phases when comparing systems. Streaming improves perceived responsiveness without necessarily reducing total work."
+    ],
+    "mechanism": [
+      "Tokenization prepares input IDs. Prefill processes the supplied context, often building a cache. Decode generates subsequent tokens step by step. Time to first token includes waiting, loading where needed, and prefill; time per output token describes the pace after generation begins.",
+      "Throughput measures work completed per unit time across requests. Latency measures an individual request's delay. Streaming improves perceived responsiveness by showing partial output, but does not necessarily reduce total compute. Cold starts add initialization or model-loading time."
+    ],
+    "example": [
+      "A summary request with a huge document waits several seconds before showing text, then streams smoothly.",
+      "A short question begins quickly but a very long answer takes time to finish.",
+      "The first case suggests examining prefill and queueing; the second depends heavily on decode length and speed."
+    ],
+    "use": "Measure first-token latency, completion latency, and aggregate throughput separately when diagnosing a service.",
+    "caution": "Fast tokens per second after generation starts can hide a long wait before the first token.",
+    "question": "Does streaming mean the whole answer was already generated?",
+    "answer": "Usually no. Tokens or chunks are delivered as they become available, so the answer can still fail or be cancelled partway through.",
+    "title": "The inference lifecycle",
+    "scope": "Tokenization, prefill, decode, time to first token, time per output token, throughput, latency, streaming, and cold starts.",
+    "sources": [
+      {
+        "label": "vLLM: paged attention",
+        "url": "https://docs.vllm.ai/en/latest/design/paged_attention/"
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "explanation": [
+      "The KV cache stores intermediate attention information so previous tokens do not need the same computation repeated during decoding. Its memory generally grows with context and concurrent sequences.",
+      "Prefix caching can reuse shared prompt computation across compatible requests. This is not semantic memory: it does not decide which past facts should be remembered or corrected."
+    ],
+    "mechanism": [
+      "A transformer KV cache stores intermediate attention information so previous tokens need not be recomputed in full at every decode step. Cache memory generally grows with sequence length and simultaneous requests, with details varying by architecture.",
+      "Prefix caching reuses compatible computation for repeated initial content. Exact reuse conditions depend on the runtime. Eviction frees cached entries; CPU offload trades device memory for transfer costs. Cache entries are computational artifacts, not an authoritative record of a user's preferences or facts."
+    ],
+    "example": [
+      "Twenty users ask questions against the same long manual.",
+      "A server may reuse a shared prefix's computation, but each conversation's differing continuation still needs its own work and state.",
+      "Increasing concurrency can exhaust memory even though the model weights are loaded only once."
+    ],
+    "use": "Manage context limits, concurrency, and cache policy together. Test realistic simultaneous traffic rather than one short prompt.",
+    "caution": "Prompt caching is not permission to reuse private data across users. Authorization and cache isolation still matter.",
+    "question": "Why does clearing a cache not necessarily delete saved chat history?",
+    "answer": "They are different stores. Cache clearing removes reusable computation; application history may live in a separate database with its own retention policy.",
+    "title": "Caches and memory",
+    "scope": "KV cache, context-length and concurrency effects, prefix/prompt caching, eviction, CPU offload, and why a cache is not durable semantic memory.",
+    "sources": [
+      {
+        "label": "vLLM: paged attention",
+        "url": "https://docs.vllm.ai/en/latest/design/paged_attention/"
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "explanation": [
+      "Batching processes multiple requests together to use hardware efficiently. Continuous batching allows requests to join or leave as generation proceeds. Chunked prefill breaks large prompt work into pieces.",
+      "Speculative decoding proposes tokens cheaply and verifies them with a target model. Optimizations involve tradeoffs: higher throughput can increase a particular user's waiting time."
+    ],
+    "mechanism": [
+      "Static batching processes a fixed group together. Dynamic batching collects requests over a waiting window. Continuous batching can add or remove sequences as generation proceeds. These improve utilization but may affect queueing and individual response time.",
+      "Paged attention manages cache blocks to reduce wasted allocation. Chunked prefill interleaves portions of long prompts with other work. Speculative decoding proposes tokens using a cheaper mechanism and verifies them with the target model. Optimized kernels and parallelism improve specific operations or distribute work; their gains depend on hardware and workload."
+    ],
+    "example": [
+      "A server receives one huge document and several short chat questions.",
+      "Processing the entire long prefill at once can delay the short requests. A supported chunked-prefill scheduler can distribute work more fairly.",
+      "The team measures tail latency as well as throughput to check that the optimization helps users."
+    ],
+    "use": "Tune using representative prompt lengths, output lengths, and concurrency. Compare quality too when an optimization changes numerical behavior.",
+    "caution": "An optimization benchmark on one GPU and workload is not a universal speed guarantee.",
+    "question": "Why might a larger batch improve throughput but hurt a single user's experience?",
+    "answer": "It can keep hardware busier while increasing time spent waiting or sharing resources. Aggregate efficiency and per-request delay are different goals.",
+    "title": "Serving optimizations",
+    "scope": "Static/dynamic/continuous batching, paged attention, chunked prefill, speculative decoding, optimized kernels, parallelism, and throughput-versus-latency tradeoffs.",
+    "sources": [
+      {
+        "label": "vLLM: paged attention",
+        "url": "https://docs.vllm.ai/en/latest/design/paged_attention/"
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "explanation": [
+      "A serving system manages more than inference. It queues requests, controls concurrency, handles cancellation, applies limits, and reports failures. Without backpressure, a busy service can exhaust memory or create long queues.",
+      "Choose interactive or batch settings according to the task. A nightly report and a conversational tutor have different latency requirements."
+    ],
+    "mechanism": [
+      "A serving system accepts requests, queues work, assigns model resources, streams results, and handles failures. Backpressure slows or rejects new work when capacity is exhausted rather than allowing an unbounded queue. Cancellation should release unnecessary work promptly.",
+      "Routing chooses a model or endpoint; fallback handles unavailable or unsuitable routes. Autoscaling adjusts capacity but model loading may be slow. API compatibility covers more than endpoint names: roles, streaming events, errors, tools, and usage fields can differ. Offline jobs can prioritize throughput; interactive chat needs predictable latency."
+    ],
+    "example": [
+      "A course tutor gets a burst of traffic.",
+      "The service limits concurrent requests, gives excess users a clear retry response, and stops generation when a user cancels.",
+      "Without those controls, every request competes for memory and many users wait behind abandoned work."
+    ],
+    "use": "Set input/output limits, queue bounds, timeouts, and cancellation behavior before exposing a model service to multiple users.",
+    "caution": "A fallback must satisfy the same data-handling and task requirements; silently routing private content elsewhere can violate expectations.",
+    "question": "Should an overnight batch job share an unlimited queue with live chat?",
+    "answer": "Usually no. Separate capacity or priority rules prevent bulk work from making interactive requests unusably slow.",
+    "title": "Serving a model as a service",
+    "scope": "Queues, backpressure, concurrency, cancellation, limits, API compatibility, model routing, fallbacks, autoscaling, and offline versus interactive jobs.",
+    "sources": [
+      {
+        "label": "vLLM: paged attention",
+        "url": "https://docs.vllm.ai/en/latest/design/paged_attention/"
+      }
+    ]
+  }
+]

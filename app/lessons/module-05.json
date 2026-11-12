@@ -1,0 +1,94 @@
+[
+  {
+    "id": 17,
+    "explanation": [
+      "Give the model a task, the relevant facts, constraints, and a definition of success. 'Summarize this for a beginner in three paragraphs, preserving the exceptions' is more testable than 'make this good.'",
+      "Few-shot prompting supplies examples of desired behavior. Include difficult cases, not only easy ones. Separating source text from instructions reduces ambiguity, though formatting alone is not a security boundary."
+    ],
+    "mechanism": [
+      "A usable instruction specifies the task, intended reader, constraints, supplied information, and what counts as success. Zero-shot prompting gives no task examples; few-shot prompting supplies examples of desired behavior. Delimiters separate source material from instructions, but are not a security boundary.",
+      "Specify an output format when another system will consume the result. Platform instruction roles may have precedence rules, but those rules depend on the product. Examples should illustrate tricky cases as well as easy ones, and should not silently contradict the written task."
+    ],
+    "example": [
+      "Instead of ‘Summarize this,’ a support lead asks: ‘Summarize the complaint for an agent in three bullets: issue, evidence, requested resolution. Do not invent missing dates.’",
+      "One example shows how to mark an absent order number as unknown.",
+      "The result is easier to evaluate because omissions and unsupported additions are visible."
+    ],
+    "use": "Use explicit acceptance criteria for recurring tasks. Start simple and add examples in response to observed failures.",
+    "caution": "Longer prompts are not inherently better. Repeated or conflicting instructions can make the task harder to follow.",
+    "question": "What should a receipt extractor return when a tax amount is absent?",
+    "answer": "Whatever missing-value convention you explicitly define, such as null, rather than a guessed amount. Validate that behavior with an example.",
+    "title": "Writing usable instructions",
+    "scope": "Task, audience, constraints, examples, acceptance criteria, zero-shot/few-shot, delimiters, output formats, and platform-dependent instruction precedence.",
+    "sources": []
+  },
+  {
+    "id": 18,
+    "explanation": [
+      "Context is what the model receives for the current request. It may include your message, earlier messages, application instructions, retrieved documents, and tool results. All of this competes for finite capacity.",
+      "The interface may display history that is no longer included in full. Applications can omit or summarize earlier messages. A larger window helps capacity but does not guarantee that every detail influences the answer correctly."
+    ],
+    "mechanism": [
+      "The context window limits the information a model can process in a request or sequence. The usable budget may include application instructions, conversation history, retrieved text, tool results, attachments, and generated output; exact accounting is model-specific.",
+      "Applications often select or summarize history rather than send everything. Truncation can remove essential conditions. Even when text fits, a model may miss details or struggle with conflicting evidence. Reserve room for the answer and keep the most relevant evidence easy to identify."
+    ],
+    "example": [
+      "You paste a long manual and ask about a warranty exception.",
+      "The application also includes previous chat messages and hidden instructions. The combined request exceeds its budget, so part of the manual is omitted.",
+      "Retrieving the relevant warranty section with its exceptions is more useful than assuming the entire upload is available to the model."
+    ],
+    "use": "Measure the assembled request, inspect what was actually included, and test questions whose answers occur in different document positions.",
+    "caution": "A file being uploaded or stored does not mean every word is present in the current model context.",
+    "question": "Why can an old instruction disappear from a long conversation?",
+    "answer": "The app may truncate or compact history. Persist important constraints explicitly and verify they appear in the context used for the next request.",
+    "title": "Context windows",
+    "scope": "Input/output budgets, hidden application instructions, attachments, selected history, tool results, truncation, long-context limitations, and conflicting evidence.",
+    "sources": []
+  },
+  {
+    "id": 19,
+    "explanation": [
+      "Persistent memory is information stored outside the model and potentially supplied later. It can record a preference or a previous project decision. Working context is the information supplied now. Weights are learned parameters.",
+      "Memory needs provenance and updates. An old address remembered confidently can be worse than no address. A good design allows corrections and distinguishes stable preferences from temporary instructions."
+    ],
+    "mechanism": [
+      "Working memory is information available for the present task. Episodic memory records events; semantic memory stores facts or preferences; procedural memory stores ways to perform tasks. These are useful application design categories, not evidence of human-like remembering.",
+      "Persistent memory requires storage plus a policy for writing, retrieving, correcting, and deleting records. Provenance identifies who supplied a memory and when. Expiry avoids treating old travel plans or temporary preferences as permanent facts. Retrieved memories still occupy context space."
+    ],
+    "example": [
+      "A learning app stores that you prefer examples about Android development.",
+      "On a later visit it retrieves that preference and includes it in the tutor's request. You change the preference to Raspberry Pi projects, and the stored record is updated.",
+      "The model's weights never needed to change for this personalized behavior."
+    ],
+    "use": "Use memory for stable, useful preferences and task state. Make it inspectable and correctable rather than storing every conversation indiscriminately.",
+    "caution": "A KV cache speeds computation; it is not the same as an application database of user memories.",
+    "question": "What should happen when a stored preference contradicts your current request?",
+    "answer": "The current explicit request should guide the task, and the application should offer a way to correct or expire the stale stored preference.",
+    "title": "Memory systems",
+    "scope": "In-context learning versus weight updates; working, episodic, semantic, and procedural memory as application design ideas; persistent storage, retrieval, expiry, corrections, and provenance.",
+    "sources": []
+  },
+  {
+    "id": 20,
+    "explanation": [
+      "Context engineering decides what information reaches the model and when. Relevant, current, well-labeled material often helps more than a large pile of unrelated text.",
+      "A handoff should preserve goals, constraints, decisions, evidence, and open questions. Summarization trades detail for space; test whether the compressed version still supports the next task."
+    ],
+    "mechanism": [
+      "Context engineering decides what information reaches the model and how it is organized. Retrieval selects relevant records; summarization compresses them; compaction replaces older conversation details with a shorter account. Each step can lose qualifications, source attribution, or unresolved questions.",
+      "A handoff should distinguish goals, verified results, assumptions, pending actions, and references. Context isolation prevents one user's information or one subtask's instructions from leaking into another. Ordering can help clarity, but no ordering trick guarantees the model will use all evidence correctly."
+    ],
+    "example": [
+      "A coding task spans several sessions.",
+      "The handoff records the failing test, files changed, commands already run, and one unverified assumption. The next session reads the current files and tests that assumption.",
+      "A vague ‘everything is almost done’ summary would conceal the remaining work and encourage false completion."
+    ],
+    "use": "Use compact, source-linked task state for long projects. Include the minimum sufficient evidence and refresh records that may have changed.",
+    "caution": "A summary is a new artifact with possible errors; do not silently turn tentative statements into confirmed facts.",
+    "question": "Which is a better handoff: ‘fixed login’ or ‘changed token refresh; unit tests pass; device sign-in untested’?",
+    "answer": "The second. It separates implementation, evidence, and remaining uncertainty, allowing the next worker to continue safely.",
+    "title": "Context engineering",
+    "scope": "Selection, ordering, summarization, compaction, handoffs, retrieval, context isolation, relevance, and preventing stale assumptions from persisting.",
+    "sources": []
+  }
+]

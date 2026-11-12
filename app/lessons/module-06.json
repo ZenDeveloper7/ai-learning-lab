@@ -1,0 +1,94 @@
+[
+  {
+    "id": 21,
+    "explanation": [
+      "A base model is trained to model data; an instruction-tuned variant is adapted to follow requests. Embedding models represent inputs for comparison, while rerankers score relevance among candidates. A vision-language model also accepts visual information.",
+      "These are different roles. A strong chat model may not be the best retrieval model. Choose according to the operation you need, not a shared family name."
+    ],
+    "mechanism": [
+      "A base language model primarily learns continuation patterns. An instruct variant is adapted to follow requests; a reasoning-oriented variant may use additional computation before answering. Coding and domain-specialist models emphasize particular tasks. Embedding models produce representations, while rerankers score candidate relevance rather than write answers.",
+      "A vision-language model accepts visual and textual information, with supported media varying by implementation. Model families can contain many sizes and revisions. A checkpoint name alone is incomplete without the revision, adaptation, tokenizer, and runtime settings."
+    ],
+    "example": [
+      "You build search over appliance manuals.",
+      "An embedding model retrieves candidate passages, a reranker orders them for the exact question, and an instruct model writes an answer from selected evidence.",
+      "Replacing all three with the same chat model may be possible but can be less efficient and requires different evaluation."
+    ],
+    "use": "Choose models by role and measured performance on representative tasks. Record exact versions so later comparisons remain meaningful.",
+    "caution": "A coding label or large parameter count does not guarantee success on your language, repository, or task.",
+    "question": "Which model type would you start with for finding semantically similar notes?",
+    "answer": "An embedding model, paired with an index and retrieval evaluation. A generative model can explain the matches afterward if needed.",
+    "title": "Model families and variants",
+    "scope": "Base, instruct, reasoning, coding, embedding, reranker, vision-language, and specialist models; checkpoints, revisions, and fine-tuned variants.",
+    "sources": []
+  },
+  {
+    "id": 22,
+    "explanation": [
+      "A model card is the closest thing to a product specification for a checkpoint. Look for intended tasks, languages, limitations, license, evaluation setup, and supported input format. Missing information should remain unknown.",
+      "Check the exact revision and runtime requirements. A benchmark without its dataset, prompting method, or comparison baseline is difficult to interpret."
+    ],
+    "mechanism": [
+      "A model card is documentation describing a released model's purpose, development, evaluation, and limits. Read supported languages and modalities, intended uses, architecture, input limits, and known weaknesses. Missing disclosure is an uncertainty to record, not permission to assume favorable details.",
+      "Check the license separately from benchmark scores. The chat template specifies how messages and roles are serialized for that model. Runtime support determines whether the architecture and quantization can actually execute on your device. Published context limits may require particular settings."
+    ],
+    "example": [
+      "You download a model for bilingual support.",
+      "Its card reports English-heavy evaluation and gives a required chat template. You test both target languages and apply that template.",
+      "One language performs poorly despite a strong overall benchmark, so you retain a fallback or select another candidate."
+    ],
+    "use": "Read the card before downloading large files or planning deployment. Turn important claims into small local checks.",
+    "caution": "A model card is a starting point, not an independent certification of fitness for your use case.",
+    "question": "What would you record if training-data details are not disclosed?",
+    "answer": "Record the disclosure gap and its implications for your requirements; do not infer a clean or representative dataset from a missing section.",
+    "title": "Reading a model card",
+    "scope": "Intended use, architecture, languages, context limits, chat template, training disclosure, evaluation, limitations, license, and required runtime support.",
+    "sources": []
+  },
+  {
+    "id": 23,
+    "explanation": [
+      "Weights contain learned parameters. A tokenizer describes how input becomes tokens. Configuration describes architecture and other settings. A chat template turns messages into the sequence the model expects.",
+      "Safetensors and GGUF are file formats, not model families. A quantization scheme describes numerical representation. A runtime executes a supported artifact. Mixing up these layers causes avoidable compatibility failures."
+    ],
+    "mechanism": [
+      "A model package usually needs more than weights. Configuration describes architecture; tokenizer files map inputs to IDs; a chat template formats messages; metadata records relevant settings. Sharded weights divide one checkpoint into several files, which the loader assembles using an index.",
+      "Safetensors is a tensor-storage format designed to avoid executing arbitrary code merely to deserialize tensors. GGUF packages tensors and metadata for compatible runtimes. An adapter contains modifications that normally require a matching base model. File format, numerical representation, and execution engine are separate choices."
+    ],
+    "example": [
+      "You copy only one file from a multi-shard checkpoint.",
+      "Loading fails because the remaining shards and index are missing. In another download, a small adapter loads only after its required base model is supplied.",
+      "Neither failure means the model is too weak; the required artifacts were incomplete."
+    ],
+    "use": "Inventory all files and verify checksums or revisions where available. Follow trusted loading instructions and inspect any requirement to execute remote code.",
+    "caution": "A GGUF filename does not by itself guarantee that your runtime supports the contained architecture or every feature.",
+    "question": "Is a 100 MB adapter necessarily a complete 100 MB language model?",
+    "answer": "No. It commonly depends on a much larger base checkpoint and compatible tokenizer, so total deployment size includes those dependencies.",
+    "title": "What you download",
+    "scope": "Weights, tokenizer, configuration, chat template, adapters, metadata, sharded checkpoints, safetensors, and GGUF. Separate file formats, quantization schemes, and execution engines.",
+    "sources": []
+  },
+  {
+    "id": 24,
+    "explanation": [
+      "Open weights means weights are available under some terms. Open source is a broader licensing claim. Access does not automatically permit every commercial use or redistribution.",
+      "Hosted models reduce infrastructure work; local models give more operational control. Compare the whole system: quality, latency, resources, licenses, privacy, and maintenance. Test your own tasks before committing."
+    ],
+    "mechanism": [
+      "Open weights means model parameters are available under stated terms. Open source concerns broader freedoms and conditions; a downloadable model may have restrictions on use, redistribution, or modifications. Hosted access avoids some infrastructure work, while self-hosting gives operational control and responsibility.",
+      "Evaluate task quality, dependencies, data handling, maintenance effort, and reproducibility alongside price. Download from an identifiable publisher, verify the exact artifact, and review loading code. Licensing and legal suitability depend on the actual terms and context, not a marketing label."
+    ],
+    "example": [
+      "A team wants to distribute a modified model with its product.",
+      "It checks the base-model license, adapter terms, runtime dependencies, and any attribution requirements before release. It also runs its own task tests.",
+      "A free download would not, by itself, answer whether redistribution is permitted."
+    ],
+    "use": "Use a short decision record listing required capabilities, constraints, measured results, and unresolved terms. Revisit it when versions change.",
+    "caution": "Self-hosting does not automatically solve privacy: logs, plugins, telemetry, and remote tools can still transmit data.",
+    "question": "What evidence supports choosing a smaller model over a larger one?",
+    "answer": "Comparable success on your representative tasks, acceptable latency, lower total resource use, and compatible terms—not size alone.",
+    "title": "Choosing responsibly",
+    "scope": "Open weights versus open source; hosted versus self-hosted; redistribution and commercial terms; task-fit evaluation, costs, dependencies, reproducibility, and trusted downloads.",
+    "sources": []
+  }
+]

@@ -1,0 +1,94 @@
+[
+  {
+    "id": 5,
+    "explanation": [
+      "Training adjusts numerical parameters called weights. Inference uses those weights to process a new input. A checkpoint is a saved state of a model, often accompanied by other information needed to resume training.",
+      "Pretraining develops broad patterns from large datasets. Post-training adapts behavior for tasks such as following instructions. Telling a chat assistant your name supplies context; it does not ordinarily rewrite its weights."
+    ],
+    "mechanism": [
+      "Architecture is the model's arrangement of operations. Parameters, often called weights, are the learned numerical settings inside it. Training changes trainable parameters; inference uses a saved set to process new input. A checkpoint is a saved training state or model snapshot, with contents depending on the saving procedure.",
+      "Pretraining builds broad capabilities from large datasets. Post-training adapts behavior, tasks, or preferences afterward. Adding a correction to a chat changes the available context; changing persistent model behavior requires a separate mechanism such as training or saved application memory."
+    ],
+    "example": [
+      "You correct an assistant: ‘Our product is called Atlas, not Atlas Pro.’",
+      "It uses Atlas in the next reply because the correction is in context. A fresh conversation without saved memory may repeat the old name.",
+      "Fine-tuning on approved examples or retrieving the current product catalog changes how future requests receive that information."
+    ],
+    "use": "Use this distinction to diagnose whether you need better context, persistent memory, current retrieval, or actual model adaptation.",
+    "caution": "A saved conversation is not a checkpoint of newly trained model weights.",
+    "question": "Does clicking Save on chat history retrain the model?",
+    "answer": "No. It normally saves application data. Any later use for training depends on the product's separate processes and settings.",
+    "title": "What learning changes",
+    "scope": "Parameters/weights, architecture, training versus inference, checkpoints, pretraining versus post-training, and why an ordinary chat correction is not an immediate weight update.",
+    "sources": []
+  },
+  {
+    "id": 6,
+    "explanation": [
+      "A dataset is a collection of choices: what to collect, whom to represent, which labels to trust, and what to remove. Repeated or mislabeled examples can teach misleading patterns. Synthetic examples are generated data, and they still need verification.",
+      "Imagine training a support classifier using only easy English messages. Strong results on similar messages tell you little about ambiguous or multilingual requests. Data coverage is part of capability."
+    ],
+    "mechanism": [
+      "Provenance records where data came from and how it was transformed. A useful dataset includes appropriate permission, consistent labels, representative languages and cases, and documented exclusions. Deduplication removes repeated or near-repeated examples that can distort learning and evaluation.",
+      "Class balance concerns how often different outcomes appear. A dataset dominated by easy negatives can reward a model for ignoring rare positives. Synthetic data is generated rather than directly observed; it still needs verification because it can inherit systematic errors."
+    ],
+    "example": [
+      "A support classifier is trained mostly on English delivery questions.",
+      "It performs poorly on Malayalam refund requests because both the language and topic were underrepresented. Adding thousands of duplicate English tickets does little to fix this.",
+      "The team collects permitted, diverse refund examples, defines labeling rules, and reviews disagreements between annotators."
+    ],
+    "use": "Audit data coverage before increasing model size. Keep source records, label definitions, and a representative held-out set.",
+    "caution": "Publicly accessible data is not automatically unrestricted for every use; record the applicable terms and permissions.",
+    "question": "Why might two annotators disagree about ‘My package is broken and late’?",
+    "answer": "The label scheme may allow only one category despite a multi-topic request. Clarify the annotation policy or support multiple labels rather than treating all disagreement as carelessness.",
+    "title": "Data is part of the system",
+    "scope": "Collection, provenance, consent, licensing, labeling, deduplication, filtering, class balance, multilingual coverage, synthetic data, and human annotation.",
+    "sources": []
+  },
+  {
+    "id": 7,
+    "explanation": [
+      "Training data teaches the model. Validation data helps select settings. Test data estimates performance after those choices are made. If nearly identical examples appear in all three sets, the test may reward memorization.",
+      "Overfitting happens when a model fits the training examples too specifically. Distribution shift means new inputs differ from the data used to develop it. Both can make impressive development results fail in practice."
+    ],
+    "mechanism": [
+      "Training data teaches the model; validation data guides development choices; test data estimates performance after those choices are made. Keep related records together when splitting, and split chronologically when predicting future events. Leakage occurs when information unavailable at prediction time enters training or evaluation.",
+      "Overfitting means learning training-specific patterns that do not generalize; underfitting means failing to capture useful patterns even there. Distribution shift changes real-world inputs. Catastrophic forgetting is loss of earlier abilities after adaptation to new data."
+    ],
+    "example": [
+      "A store predicts returns using order records.",
+      "Its dataset accidentally includes the ‘refund issued’ field, which is populated only after a return. Offline accuracy looks excellent. At checkout, that field does not exist.",
+      "Removing the leaked field and testing on later orders gives a more realistic estimate."
+    ],
+    "use": "Use held-out and time-aware evaluation whenever model performance influences deployment. Test old capabilities again after fine-tuning.",
+    "caution": "A randomly shuffled split is not always independent: messages from one conversation or copies of one document can cross the split.",
+    "question": "A model recognizes dogs only on grass. What failure might this indicate?",
+    "answer": "A spurious correlation: the background became a shortcut. Test dogs indoors and other animals on grass, then improve the training coverage.",
+    "title": "Generalization and failure",
+    "scope": "Train/validation/test splits; leakage, contamination, overfitting, underfitting, distribution shift, spurious correlations, and catastrophic forgetting.",
+    "sources": []
+  },
+  {
+    "id": 8,
+    "explanation": [
+      "A loss function provides a signal about how wrong a prediction is under the chosen objective. Backpropagation assigns credit to parameters; an optimizer uses that information to update them. The learning rate controls update size.",
+      "A batch is a group of examples processed together; an epoch is a pass through a dataset. Smaller training loss is useful evidence, but held-out performance determines whether the learning generalizes."
+    ],
+    "mechanism": [
+      "Loss is the training objective's error signal, not a universal measure of usefulness. Backpropagation traces how trainable settings contributed to that signal; gradients describe directions of change. An optimizer uses this information to update parameters, and the learning rate controls update scale.",
+      "A batch is a group of examples processed together. A training step typically means one optimizer update; an epoch is a pass through the dataset. Seeds control some randomness. Checkpoints permit inspection or resumption; early stopping halts training when validation no longer improves."
+    ],
+    "example": [
+      "A classifier's training loss keeps falling while its validation score gets worse.",
+      "The team saves checkpoints, compares them on validation data, and selects an earlier one rather than automatically taking the final model.",
+      "It investigates overfitting and label quality before spending another day training."
+    ],
+    "use": "Read training and validation curves together. Make short sanity runs before committing substantial time or compute.",
+    "caution": "A lower training loss can reflect memorization or an unsuitable objective, not better performance for users.",
+    "question": "If a dataset is seen three times, how many epochs is that?",
+    "answer": "Three epochs. The number of update steps also depends on batch size, gradient accumulation, and how the trainer handles incomplete batches.",
+    "title": "Training controls without equations",
+    "scope": "Loss as a training signal; gradients and backpropagation as credit assignment; optimizer, learning rate, batch, step, epoch, seed, checkpoint, validation curve, and early stopping.",
+    "sources": []
+  }
+]

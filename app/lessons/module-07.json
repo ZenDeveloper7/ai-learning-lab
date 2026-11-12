@@ -1,0 +1,94 @@
+[
+  {
+    "id": 25,
+    "explanation": [
+      "Memory capacity determines whether model weights and runtime state can fit. Memory bandwidth affects how quickly data moves. Compute capability affects how fast operations execute. These are related but distinct constraints.",
+      "A model that loads may still be too slow for interactive use. Longer context and multiple requests increase memory demands beyond the weight file. Unified memory and discrete GPU memory have different operating tradeoffs."
+    ],
+    "mechanism": [
+      "RAM is main system memory; VRAM is memory associated with many discrete GPUs. Unified-memory systems share a memory pool across processors, but capacity, bandwidth, and software support still matter. CPUs handle general workloads; GPUs excel at many parallel operations; NPUs accelerate supported neural workloads.",
+      "Weights are only part of memory use: runtime buffers, caches, and other applications also need space. Bandwidth limits how quickly data moves, while compute limits processing. Storage affects loading, and power or thermal throttling can reduce sustained speed."
+    ],
+    "example": [
+      "A quantized model fits on a small computer but generates slowly.",
+      "The user checks whether computation uses an accelerated backend and whether memory transfers are the bottleneck. Lowering context size reduces cache demand but does not magically increase hardware bandwidth.",
+      "The machine may be suitable for occasional offline tasks rather than interactive chat."
+    ],
+    "use": "Measure peak memory, loading time, and generation speed on the intended device. Leave headroom for the operating system and concurrent requests.",
+    "caution": "An NPU's advertised operations rate does not imply support for your model, precision, or runtime.",
+    "question": "Why can doubling context cause an out-of-memory error after a model loaded successfully?",
+    "answer": "Longer sequences can require larger caches and intermediate buffers. Loading weights proves only that the initial footprint fits.",
+    "title": "Hardware literacy",
+    "scope": "CPU, GPU, NPU, RAM, VRAM, unified memory, bandwidth, compute, storage, thermals, power, and why a model fitting in memory does not imply useful speed.",
+    "sources": []
+  },
+  {
+    "id": 26,
+    "explanation": [
+      "A local chat interface is not necessarily the inference engine. The interface talks to a runtime, which uses hardware backends and drivers to execute a model. A local API server makes that capability available to other local software.",
+      "CPU offloading moves some work away from the GPU and can help a model fit, often with a performance cost. Check architecture and quantization support before downloading."
+    ],
+    "mechanism": [
+      "The user interface accepts your request. A model manager downloads and selects artifacts. An inference runtime loads and executes them. A backend implements device-specific operations, and drivers expose the hardware. An API server wraps inference in a network interface.",
+      "CPU/GPU offloading places different parts of the workload on different devices. Compatibility must hold across architecture, quantization, backend, driver, and hardware. A polished interface can hide these layers, so inspect runtime logs when performance or capability differs from expectations."
+    ],
+    "example": [
+      "A desktop chat app responds slowly despite a powerful GPU.",
+      "Its runtime log shows the model running on CPU because the selected backend lacks the required acceleration support.",
+      "Changing the compatible backend or artifact fixes the deployment issue; rewriting the prompt would not."
+    ],
+    "use": "Use this stack to locate failures. Check the layer responsible before reinstalling everything or selecting another model.",
+    "caution": "A local-looking interface can call a remote provider. Confirm the configured endpoint and data flow.",
+    "question": "Which component exposes a local model at an HTTP address?",
+    "answer": "The API server. It receives requests and invokes the runtime; the model weights themselves do not listen on a network port.",
+    "title": "The local software stack",
+    "scope": "User interface, model manager, inference runtime, backend, driver, and local API server; CPU/GPU offloading; acceleration support and platform compatibility.",
+    "sources": []
+  },
+  {
+    "id": 27,
+    "explanation": [
+      "Start with a hardware inventory and a small compatible model. Record the exact model revision, template, runtime version, prompt, output limit, and sampling settings. Change one thing at a time.",
+      "Use fixed prompts to create a baseline. Measure loading separately from generation. A reproducible modest result is more informative than an impressive number with unknown settings."
+    ],
+    "mechanism": [
+      "A reproducible run records enough details for another person to repeat it: hardware, OS, runtime version, model source and revision, tokenizer/template, quantization, context limit, output limit, and generation settings. Keep representative baseline prompts with expected properties, not only a favorite demo.",
+      "First establish a small successful request, then test longer inputs and the target language. Record both answer quality and resource use. A seed can reduce randomness but cannot guarantee identical results across hardware, kernels, or changing hosted services."
+    ],
+    "example": [
+      "You evaluate a local model for summarizing meeting notes.",
+      "You save three permitted sample transcripts, specify a five-bullet summary with no invented decisions, and record latency and peak memory.",
+      "After upgrading the runtime, you repeat the same inputs and compare omissions, hallucinations, and performance."
+    ],
+    "use": "Use this process before benchmarking alternatives or sharing a local setup. It separates a real improvement from an accidental configuration change.",
+    "caution": "‘I ran the 7B model’ is not enough to reproduce a result: multiple revisions, templates, and quantized builds can differ.",
+    "question": "What should be fixed before comparing two quantization levels?",
+    "answer": "The base revision, prompts, generation settings, runtime, device, and evaluation criteria, so the quantization change is interpretable.",
+    "title": "A reproducible local run",
+    "scope": "Hardware inventory, suitable model choice, verified source, exact revision, chat template, context/output limits, generation settings, logs, and baseline prompts.",
+    "sources": []
+  },
+  {
+    "id": 28,
+    "explanation": [
+      "Out-of-memory failures can come from weights, caches, activations, or concurrency. Bad output can come from a mismatched chat template rather than poor weights. Slow responses can reflect CPU offload or unsupported acceleration.",
+      "Local software may still call remote services for some features. Inspect the actual data flow. Binding a server to localhost limits network exposure; binding to every interface changes who may reach it."
+    ],
+    "mechanism": [
+      "Diagnose by symptom and stage. Loading errors suggest missing files, unsupported architecture, or incompatible formats. Out-of-memory errors can involve weights, caches, batch size, or other processes. Slow first response differs from slow token generation and may have a different cause.",
+      "Nonsensical role markers can indicate a wrong chat template. Repetition can come from formatting, model behavior, or decoding. Check acceleration logs before assuming GPU use. Inspect network binding: a server listening on all interfaces may be reachable beyond your device."
+    ],
+    "example": [
+      "A model works with a short question but crashes on a long document.",
+      "The user measures memory, reduces context and concurrent requests, and repeats the test. The crash disappears, indicating a capacity issue rather than a corrupted download.",
+      "They then select a supported memory-saving configuration and recheck answer quality."
+    ],
+    "use": "Change one variable at a time and retain a known-good prompt. Keep error messages and settings, excluding secrets.",
+    "caution": "A quantized model can use less memory yet still fail if the runtime lacks kernels for that quantization or architecture.",
+    "question": "What should you inspect when a supposedly local assistant continues working only with Internet access?",
+    "answer": "Its configured model endpoint, remote tool calls, authentication dependencies, and documented network behavior. The interface alone does not establish offline operation.",
+    "title": "Troubleshooting local inference",
+    "scope": "Out-of-memory errors, slow loading, slow generation, unsupported architectures, bad templates, quantization compatibility, server exposure, and checking whether a feature uses remote services.",
+    "sources": []
+  }
+]

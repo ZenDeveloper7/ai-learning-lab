@@ -1,0 +1,114 @@
+[
+  {
+    "id": 13,
+    "explanation": [
+      "A text generator repeatedly selects a next token using the context so far. Greedy decoding chooses the highest-scoring option; sampling can choose among plausible alternatives. Temperature and top-p change selection behavior when supported.",
+      "Increasing variety is not the same as improving truth. Output limits and stop conditions determine when generation ends. Repeating a prompt may produce different results even when the intended task is unchanged."
+    ],
+    "mechanism": [
+      "At each generation step, a language model scores candidate next tokens. Greedy decoding chooses the highest-scored candidate. Sampling chooses probabilistically; temperature changes how concentrated the distribution is. Top-k restricts candidates by count, while top-p retains a probability-mass-based set.",
+      "The chosen token becomes part of the next input state, so earlier choices affect later ones. A stop token or configured stop sequence may end generation. An output limit can instead cut an answer off before it finishes. Streaming exposes partial output while this process continues."
+    ],
+    "example": [
+      "You ask for three product names several times.",
+      "Sampling may produce different lists. For extracting an invoice number, you prefer a tightly constrained format and validate it against the source instead.",
+      "If a response stops halfway through JSON, inspect the finish reason and output budget rather than assuming the network failed."
+    ],
+    "use": "Choose decoding settings to match creativity versus consistency, then evaluate the actual outputs. Exact factual work still needs evidence and validation.",
+    "caution": "A low temperature does not make a wrong answer true, nor guarantee identical results across hardware and service revisions.",
+    "question": "Why might a model repeat itself until the output limit?",
+    "answer": "Its generated continuation can reinforce a repetitive pattern. Prompting, model choice, decoding controls, and explicit stopping conditions can all matter.",
+    "title": "How text is produced",
+    "scope": "Autoregressive generation, token probabilities, greedy decoding, sampling, temperature, top-p/top-k, stop sequences, output limits, and repetition.",
+    "sources": [
+      {
+        "label": "Transformers: text generation",
+        "url": "https://huggingface.co/docs/transformers/llm_tutorial"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "explanation": [
+      "Some models spend additional computation exploring or checking steps before returning an answer. Decomposing a problem and verifying intermediate results can help, but extra computation can also pursue a mistaken assumption.",
+      "A displayed explanation is evidence about what the system says, not a guaranteed recording of its internal computation. Evaluate the final claim using tests, sources, or independent calculations."
+    ],
+    "mechanism": [
+      "Extra inference-time computation can let a system decompose a problem, explore candidates, or check intermediate results. Self-consistency compares several generated solutions; search explores alternatives; verification tests a proposed result against a rule or external tool.",
+      "These mechanisms can improve some tasks but cost time and resources. Several answers can share the same mistake, and a polished explanation may be constructed after a conclusion. Treat displayed reasoning as an explanation to inspect, not privileged proof of the model's internal process."
+    ],
+    "example": [
+      "A scheduling assistant proposes a meeting time.",
+      "It separates attendee availability, timezone conversion, and room capacity, then checks the proposed slot against a calendar tool.",
+      "The tool check discovers one conflict. Revising the proposal is more useful than simply producing a longer explanation of the first answer."
+    ],
+    "use": "Use additional reasoning and verification for tasks with dependencies or costly mistakes. Simple extraction may not benefit from a long deliberation.",
+    "caution": "More reasoning tokens do not guarantee accuracy. The system still needs correct information and a useful checking method.",
+    "question": "Would five agreeing answers independently prove a disputed date?",
+    "answer": "No. They may repeat the same learned misconception. Check a primary source or authoritative record.",
+    "title": "Reasoning behavior",
+    "scope": "Reasoning-oriented models, test-time compute, decomposition, search, verification, self-consistency, and why a displayed explanation is not a faithful guaranteed transcript of internal computation.",
+    "sources": [
+      {
+        "label": "Transformers: text generation",
+        "url": "https://huggingface.co/docs/transformers/llm_tutorial"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "explanation": [
+      "A hallucination is unsupported or incorrect generated content presented as an answer. It can be a made-up quotation, a nonexistent API, or an invented event. Fluent wording makes such errors easy to overlook.",
+      "Sycophancy is excessive agreement with the user. A useful assistant should sometimes challenge a premise or say it lacks evidence. Asking a leading question can expose this weakness."
+    ],
+    "mechanism": [
+      "A hallucination is output that presents unsupported or false content as if established. It can appear in names, quotations, references, code APIs, and summaries. Sycophancy means leaning toward the user's view instead of evaluating it critically. Ambiguity gives the model several plausible interpretations.",
+      "Training data can contain bias, and a model may reproduce or amplify it. Information can also be outdated. Fluent language and confident wording are presentation features, not reliable measures of evidence. Exact counting and arithmetic often benefit from deterministic tools."
+    ],
+    "example": [
+      "A learner asks for the author of a nonexistent paper.",
+      "The assistant produces a plausible title, author, and journal rather than questioning the premise. Searching the publisher's records finds no matching article.",
+      "A better response would flag the missing evidence and ask for a link or other identifying detail."
+    ],
+    "use": "Watch for claims that need outside evidence, especially citations, exact numbers, and rapidly changing information. Encourage the system to identify missing inputs.",
+    "caution": "A real-looking URL or quotation is not a verified citation; open the source and check the claim it actually supports.",
+    "question": "What should an assistant do when ‘the latest policy’ is not supplied and it cannot browse?",
+    "answer": "State the information gap and request the policy or access to an authoritative source, rather than inventing a current version.",
+    "title": "Typical failure modes",
+    "scope": "Hallucination, fabricated citations, ambiguity, sycophancy, bias, brittle counting, outdated information, and unsupported confidence.",
+    "sources": [
+      {
+        "label": "Transformers: text generation",
+        "url": "https://huggingface.co/docs/transformers/llm_tutorial"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "explanation": [
+      "Separate the claim from the evidence. A citation must exist and support the specific statement. A tool must have actually run successfully. A calculation should be reproducible.",
+      "When an answer fails, ask whether information was missing, retrieval was wrong, interpretation failed, or execution broke. Rephrasing the prompt cannot fix every category of failure."
+    ],
+    "mechanism": [
+      "Ground truth is the reference used to judge an answer, such as a database record or independently verified label. It can itself contain errors, so record its origin. Calibration concerns whether stated confidence matches observed correctness across many cases. Abstention means declining to answer when evidence is insufficient.",
+      "Separate factual verification from execution verification. A model may correctly propose a database update that never runs. Independent evidence is stronger when it comes from a source or method with different failure modes, rather than another paraphrase of the same model output."
+    ],
+    "example": [
+      "An assistant says it updated a delivery address.",
+      "You inspect the actual order record and find the original address. The text was a claim of completion; the write operation timed out.",
+      "The system checks the operation result and reads the record back before reporting success."
+    ],
+    "use": "Use calculators for arithmetic, authoritative records for account facts, and tests for code behavior. Match the checking method to the claim.",
+    "caution": "A model's numerical confidence is not automatically a calibrated probability.",
+    "question": "How would you verify a summary's quoted cancellation clause?",
+    "answer": "Locate the clause in the source, check its surrounding exceptions and date, and confirm the summary preserves its meaning.",
+    "title": "Checking answers",
+    "scope": "Ground truth, independent evidence, source checking, abstention, calibration, deterministic tools, and distinguishing model failure from missing context or failed execution.",
+    "sources": [
+      {
+        "label": "Transformers: text generation",
+        "url": "https://huggingface.co/docs/transformers/llm_tutorial"
+      }
+    ]
+  }
+]
